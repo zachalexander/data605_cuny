@@ -1,0 +1,75 @@
+---
+title: "DATA 605 - Homework 1"
+author: "Zach Alexander"
+date: "1/28/2020"
+output: html_document
+---
+
+***
+
+#### Question 1
+
+**Calculate the dot product $u.v$ where $u = [0.5; 0.5]$ and $v = [3; -4]$.**  
+
+To take the dot product we'll use the formula: $v.w = v_{1}w_{1} + v_{2}w_{2} + v_{3}w_{3} + ... + v_{n}w_{n}$  
+
+Therefore, for our example we will do the following:  
+
+$u.v = (0.5 * 3) + (0.5 * -4)$  
+$u.v = (1.5) + (-2)$  
+$u.v = -0.5$  
+
+> The dot product of $u.v$ is -0.5.  
+
+***
+
+#### Question 2
+
+**What are the lengths of $u$ and $v$? Please note that the mathematical notion of length of a vector is not the same as a computer science definition.**  
+
+In order to find the length of $u$ and $v$, we'll have to use the following equation: $||a|| = \sqrt{(\vec{a_{1}})^{2} + (\vec{a_{2}})^{2} }$  
+
+Which for our question is:  
+
+$||u|| = \sqrt{0.5^{2} + 0.5^{2}}$  
+$||u|| = \sqrt{0.25 + 0.25}$  
+$||u|| = \sqrt{0.5}$  
+$||u|| = 0.70710678$  
+
+$||v|| = \sqrt{3^{2} + -4^{2}}$  
+$||v|| = \sqrt{9 + 16}$  
+$||v|| = \sqrt{25}$  
+$||v|| = 5$  
+
+> The length of $u$ is $\sqrt{0.5}$ or ~0.707106. The length of $v$ is 5. 
+
+***
+
+#### Question 3
+
+**What is the linear combination: $3u - 2v$?**  
+
+To solve this, we substitute for $u$ and $v$:  
+
+$=3[0.5, 0.5] - 2[3, -4]$  
+$=[1.5, 1.5] - [6, -8]$  
+$=[(1.5 - 6), (1.5 - -8)]$  
+$=[-4.5, 9.5]$  
+
+> The linear combination is [-4.5, 9.5].  
+
+***
+
+#### Question 4
+
+**What is the angle between $u$ and $v$?**  
+
+```{r}
+acos(-0.1414) * 180/pi
+```
+
+
+
+
+
+
