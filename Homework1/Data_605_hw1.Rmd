@@ -7,6 +7,10 @@ output: html_document
 
 ***
 
+### PROBLEM SET #1
+
+***
+
 > Question #1: Calculate the dot product $u.v$ where $u = [0.5, 0.5]$ and $v = [3, -4]$. 
 
 ***
@@ -91,30 +95,147 @@ q3_1 - q3_2
 
 ***
 
-To solve this problem, we can refer to Module 1, which mentions that the angle between two vectors can be found by determining the dot-product between two vectors and their lengths. Since they are proportional to one another, we also know that the cosine of the angle between them is also proportional to these two attributes. Therefore, we can use the equation: $cos \space \theta = \frac{u.v}{||\vec{u}|| \times ||\vec{v}||}$
+To solve this problem, we can refer to Module 1, which mentions that the angle between two vectors can be found by determining the dot-product between two vectors and their lengths. Since they are proportional to one another, we also know that the cosine of the angle between them is also proportional to these two attributes. Therefore, we can use the equation:  
+
+$cos \space \theta = \frac{u.v}{||\vec{u}|| \times ||\vec{v}||}$  
 
 With this in mind, we've already found $u.v = -0.5$, $||\vec{u}|| = \sqrt{0.5}$, and $||\vec{v}|| = 5$  
 
-We can substitute these values into our equation:
+We can substitute these values into our equation:  
 
-$cos \space \theta = \frac{-0.5}{\sqrt{0.5} \times 5}$  
-$cos \space \theta = \frac{-0.5}{3.5355}$
-$cos \space \theta = -0.1414$
+$cos \space \theta = \frac{-0.5}{\sqrt{0.5} \times 5}$   
+$cos \space \theta = \frac{-0.5}{3.5355}$  
+$cos \space \theta = -0.1414$  
 
-To find the angle between u and v, we'll then have to solve for theta:
+To find the angle between u and v, we'll then have to solve for theta:  
 
-$\theta = cos^{-1}(-0.1414)$, which is also the arccosine of this number.  
-$\theta = 1.712672 \space radians$
+$\theta = cos^{-1}(-0.1414)$, which is also the arccosine of this number.    
+$\theta = 1.712672 \space radians$  
 
-Which can then be converted from radians to degrees by multiplying by $\frac{180}{\pi}$:
+Which can then be converted from radians to degrees by multiplying by $\frac{180}{\pi}$:  
 
-$\theta = 1.712672 \space radians \times \frac{180}{\pi}$  
-$\theta = 98.13 \space degrees$
+$\theta = 1.712672 \space radians \times \frac{180}{\pi}$ 
+$\theta = 98.13 \space degrees$  
 
 **The angle between $u$ and $v$ is approximately 98.13 degrees.**  
 
 
+Checking with R:
+
+```{r}
+cos_theta <- (-0.5) / (sqrt(0.5) * 5)
+theta <- acos(cos_theta)
+
+theta_degrees <- theta * (180/pi)
+
+paste0('The angle is about ', round(theta_degrees, digits = 2), ' degrees.')
+```
+
+***
+
+### PROBLEM SET #2
+
+***
+
+> Set up a system of equations with 3 variables and 3 constraints and solve for x. Please write a function in R that will take two variables (matrix A & constraint vector b) and solve using elimination. Your function should produce the right answer for the system of equations for any 3-variable, 3-equation system. You don’t have to worry about degenerate cases and can safely assume that the function will only be tested with a system of equations that has a solution. Please note that you do have to worry about zero pivots, though. Please note that you should not use the built-in function solve to solve this system or use matrix inverses. The approach that you should employ is to construct an Upper Triangular Matrix and then back-substitute to get the solution. Alternatively, you can augment the matrix A with vector b and jointly apply the Gauss Jordan elimination procedure.
 
 
+```{r}
+echelon <- function(a, b) {
+  print(a)
+  if(a[1, 1] == 1){
+    
+    # First zero (R2)
+    
+    mult_1 <- a[2, 1]
+    
+    a[2, 1] <-  a[2, 1] - (a[1, 1] * mult_1)
+    a[2, 2] <-  a[2, 2] - (a[1, 2] * mult_1)
+    a[2, 3] <-  a[2, 3] - (a[1, 3] * mult_1)
+    
+    b[2, 1] <- b[2, 1] - (b[1, 1] * mult_1)
+    
+    # Second zero (R3)
+    
+    if(a[3, 1] == 0){
+      
+      print(TRUE)
+      
+    } else {
+      
+      mult_2 <- a[3, 1]
+      
+      a[3, 1] <-  a[3, 1] - (a[1, 1] * mult_2)
+      a[3, 2] <-  a[3, 2] - (a[1, 2] * mult_2)
+      a[3, 3] <-  a[3, 3] - (a[1, 3] * mult_2)
+      
+      b[3, 1] <- b[3, 1] - (b[1, 1] * mult_2)
+    
+    }
+    
+    # Third zero (R3)
+    
+    if(a[3, 2] == 0){
+      
+      print(TRUE)
+      
+    } else {
+      
+      mult_3 <- a[2, 2]
+      mult_4 <- a[3, 2]
 
+      a[3, 1] <-  (a[3, 1] * mult_3) - (a[2, 1] * mult_4)
+      a[3, 2] <-  (a[3, 2] * mult_3) - (a[2, 2] * mult_4)
+      a[3, 3] <-  (a[3, 3] * mult_3) - (a[2, 3] * mult_4)
+      
+      b[3, 1] <- (b[3, 1] * mult_3) - (b[2, 1] * mult_4)
+      
+    }
+    
+    
+    
+    
+    # solve for z, then y, then x
+    
+    if(a[3, 3] == 1){
+      print(TRUE)
+      print(b[3, 1])
+    } else {
+
+      mult_5 <- a[3, 3]
+      a[3, 3] <- a[3, 3] / mult_5
+      b[3, 1] <- b[3, 1] / mult_5
+
+      z <- b[3, 1]
+      y <- (b[2, 1])/(a[2, 2]) + z
+      # x <- b[1, 1]- (a[1, 2]*y) - (a[1, 3]*z)
+
+    }
+    
+    
+    print(a)
+    print(b)
+    paste0('z = ', round(z, digits = 2))
+    # print(round(y, digits = 2))
+    # print(x)
+    
+    
+  } else {
+    print(FALSE)
+  }
+  
+  
+}
+
+# mat1 <- matrix(c(1, 3, 0, 2, 8, 4, 1, 1, 1), ncol = 3, nrow = 3)
+# mat2 <- matrix(c(2, 12, 2), ncol = 1, nrow = 3)
+
+# echelon(mat1, mat2)
+
+mat3 <- matrix(c(1, 2, -1, 1, -1, -2, 3, 5, 4), ncol = 3, nrow = 3)
+mat4 <- matrix(c(1, 2, 6), ncol = 1, nrow = 3)
+
+echelon(mat3, mat4)
+
+```
 

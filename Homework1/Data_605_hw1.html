@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Zach Alexander" />
@@ -255,9 +256,7 @@ h6 {
 </style>
 
 
-</head>
 
-<body>
 
 <style type="text/css">
 .main-container {
@@ -271,7 +270,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -288,8 +286,6 @@ summary {
 </style>
 
 
-
-<div class="container-fluid main-container">
 
 <!-- tabsets -->
 
@@ -347,20 +343,17 @@ summary {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
 
 
 
@@ -370,15 +363,18 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">DATA 605 - Homework 1</h1>
-<h4 class="author"><em>Zach Alexander</em></h4>
-<h4 class="date"><em>1/28/2020</em></h4>
+<h4 class="author">Zach Alexander</h4>
+<h4 class="date">1/28/2020</h4>
 
 </div>
 
 
 <hr />
+<div id="problem-set-1" class="section level3">
+<h3>PROBLEM SET #1</h3>
+<hr />
 <blockquote>
-<p>Question #1: Calculate the dot product <span class="math inline">\(u.v\)</span> where <span class="math inline">\(u = [0.5; 0.5]\)</span> and <span class="math inline">\(v = [3; -4]\)</span>.</p>
+<p>Question #1: Calculate the dot product <span class="math inline">\(u.v\)</span> where <span class="math inline">\(u = [0.5, 0.5]\)</span> and <span class="math inline">\(v = [3, -4]\)</span>.</p>
 </blockquote>
 <hr />
 <p>To take the dot product we’ll use the formula: <span class="math inline">\(v.w = v_{1}w_{1} + v_{2}w_{2} + v_{3}w_{3} + ... + v_{n}w_{n}\)</span></p>
@@ -387,6 +383,10 @@ $(document).ready(function () {
 <span class="math inline">\(u.v = (1.5) + (-2)\)</span><br />
 <span class="math inline">\(u.v = -0.5\)</span></p>
 <p><strong>The dot product of <span class="math inline">\(u.v\)</span> is -0.5. </strong></p>
+<p>Checking with R:</p>
+<pre class="r"><code>q1 &lt;- (0.5 * 3) + (0.5 * -4)
+q1</code></pre>
+<pre><code>## [1] -0.5</code></pre>
 <hr />
 <blockquote>
 <p>Question #2: What are the lengths of <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span>? Please note that the mathematical notion of length of a vector is not the same as a computer science definition.</p>
@@ -403,6 +403,14 @@ $(document).ready(function () {
 <span class="math inline">\(||v|| = \sqrt{25}\)</span><br />
 <span class="math inline">\(||v|| = 5\)</span></p>
 <p><strong>The length of <span class="math inline">\(u\)</span> is <span class="math inline">\(\sqrt{0.5}\)</span> or ~0.707106. The length of <span class="math inline">\(v\)</span> is 5. </strong></p>
+<p>Checking with R:</p>
+<pre class="r"><code>q2_u &lt;- sqrt(0.5^2 + 0.5^2)
+q2_v &lt;- sqrt(3^2 + (-4*-4))
+
+paste0(&#39;u is equal to &#39;, q2_u)</code></pre>
+<pre><code>## [1] &quot;u is equal to 0.707106781186548&quot;</code></pre>
+<pre class="r"><code>paste0(&#39;v is equal to &#39;, q2_v)</code></pre>
+<pre><code>## [1] &quot;v is equal to 5&quot;</code></pre>
 <hr />
 <blockquote>
 <p>Question #3: What is the linear combination: <span class="math inline">\(3u - 2v\)</span>?</p>
@@ -414,23 +422,47 @@ $(document).ready(function () {
 <span class="math inline">\(=[(1.5 - 6), (1.5 - -8)]\)</span><br />
 <span class="math inline">\(=[-4.5, 9.5]\)</span></p>
 <p><strong>The linear combination is [-4.5, 9.5]. </strong></p>
+<p>Checking with R:</p>
+<pre class="r"><code>q3_1 &lt;- c((3*0.5), (3*0.5))
+q3_2 &lt;- c((2*3), (2*-4))
+
+q3_1 - q3_2</code></pre>
+<pre><code>## [1] -4.5  9.5</code></pre>
 <hr />
 <blockquote>
 <p>Question #4: What is the angle between <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span>?</p>
 </blockquote>
 <hr />
-<p>To solve this problem, we can refer to Module 1, which mentions that the angle between two vectors can be found by determining the dot-product between two vectors and their lengths. Since they are proportional to one another, we also know that the cosine of the angle between them is also proportional to these two attributes. Therefore, we can use the equation: <span class="math inline">\(cos \space \theta = \frac{u.v}{||\vec{u}|| \times ||\vec{v}||}\)</span></p>
+<p>To solve this problem, we can refer to Module 1, which mentions that the angle between two vectors can be found by determining the dot-product between two vectors and their lengths. Since they are proportional to one another, we also know that the cosine of the angle between them is also proportional to these two attributes. Therefore, we can use the equation:</p>
+<p><span class="math inline">\(cos \space \theta = \frac{u.v}{||\vec{u}|| \times ||\vec{v}||}\)</span></p>
 <p>With this in mind, we’ve already found <span class="math inline">\(u.v = -0.5\)</span>, <span class="math inline">\(||\vec{u}|| = \sqrt{0.5}\)</span>, and <span class="math inline">\(||\vec{v}|| = 5\)</span></p>
 <p>We can substitute these values into our equation:</p>
 <p><span class="math inline">\(cos \space \theta = \frac{-0.5}{\sqrt{0.5} \times 5}\)</span><br />
-<span class="math inline">\(cos \space \theta = \frac{-0.5}{3.5355}\)</span> <span class="math inline">\(cos \space \theta = -0.1414\)</span></p>
+<span class="math inline">\(cos \space \theta = \frac{-0.5}{3.5355}\)</span><br />
+<span class="math inline">\(cos \space \theta = -0.1414\)</span></p>
 <p>To find the angle between u and v, we’ll then have to solve for theta:</p>
 <p><span class="math inline">\(\theta = cos^{-1}(-0.1414)\)</span>, which is also the arccosine of this number.<br />
 <span class="math inline">\(\theta = 1.712672 \space radians\)</span></p>
 <p>Which can then be converted from radians to degrees by multiplying by <span class="math inline">\(\frac{180}{\pi}\)</span>:</p>
-<p><span class="math inline">\(\theta = 1.712672 \space radians \times \frac{180}{\pi}\)</span><br />
-<span class="math inline">\(\theta = 98.13 \space degrees\)</span></p>
+<p><span class="math inline">\(\theta = 1.712672 \space radians \times \frac{180}{\pi}\)</span> <span class="math inline">\(\theta = 98.13 \space degrees\)</span></p>
 <p><strong>The angle between <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span> is approximately 98.13 degrees.</strong></p>
+<p>Checking with R:</p>
+<pre class="r"><code>cos_theta &lt;- (-0.5) / (sqrt(0.5) * 5)
+theta &lt;- acos(cos_theta)
+
+theta_degrees &lt;- theta * (180/pi)
+
+paste0(&#39;The angle is about &#39;, round(theta_degrees, digits = 2), &#39; degrees.&#39;)</code></pre>
+<pre><code>## [1] &quot;The angle is about 98.13 degrees.&quot;</code></pre>
+<hr />
+</div>
+<div id="problem-set-2" class="section level3">
+<h3>PROBLEM SET #2</h3>
+<hr />
+<blockquote>
+<p>Set up a system of equations with 3 variables and 3 constraints and solve for x. Please write a function in R that will take two variables (matrix A &amp; constraint vector b) and solve using elimination. Your function should produce the right answer for the system of equations for any 3-variable, 3-equation system. You don’t have to worry about degenerate cases and can safely assume that the function will only be tested with a system of equations that has a solution. Please note that you do have to worry about zero pivots, though. Please note that you should not use the built-in function solve to solve this system or use matrix inverses. The approach that you should employ is to construct an Upper Triangular Matrix and then back-substitute to get the solution. Alternatively, you can augment the matrix A with vector b and jointly apply the Gauss Jordan elimination procedure.</p>
+</blockquote>
+</div>
 
 
 
@@ -449,6 +481,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
