@@ -7,9 +7,9 @@ output: html_document
 
 ***
 
-#### Question 1
+> Question #1: Calculate the dot product $u.v$ where $u = [0.5, 0.5]$ and $v = [3, -4]$. 
 
-**Calculate the dot product $u.v$ where $u = [0.5; 0.5]$ and $v = [3; -4]$.**  
+***
 
 To take the dot product we'll use the formula: $v.w = v_{1}w_{1} + v_{2}w_{2} + v_{3}w_{3} + ... + v_{n}w_{n}$  
 
@@ -19,13 +19,21 @@ $u.v = (0.5 * 3) + (0.5 * -4)$
 $u.v = (1.5) + (-2)$  
 $u.v = -0.5$  
 
-> The dot product of $u.v$ is -0.5.  
+**The dot product of $u.v$ is -0.5.  **  
+
+Checking with R:
+
+```{r}
+q1 <- (0.5 * 3) + (0.5 * -4)
+q1
+```
+
 
 ***
 
-#### Question 2
+> Question #2: What are the lengths of $u$ and $v$? Please note that the mathematical notion of length of a vector is not the same as a computer science definition.
 
-**What are the lengths of $u$ and $v$? Please note that the mathematical notion of length of a vector is not the same as a computer science definition.**  
+***
 
 In order to find the length of $u$ and $v$, we'll have to use the following equation: $||a|| = \sqrt{(\vec{a_{1}})^{2} + (\vec{a_{2}})^{2} }$  
 
@@ -41,13 +49,23 @@ $||v|| = \sqrt{9 + 16}$
 $||v|| = \sqrt{25}$  
 $||v|| = 5$  
 
-> The length of $u$ is $\sqrt{0.5}$ or ~0.707106. The length of $v$ is 5. 
+**The length of $u$ is $\sqrt{0.5}$ or ~0.707106. The length of $v$ is 5. **  
+
+Checking with R:
+
+```{r}
+q2_u <- sqrt(0.5^2 + 0.5^2)
+q2_v <- sqrt(3^2 + (-4*-4))
+
+paste0('u is equal to ', q2_u)
+paste0('v is equal to ', q2_v)
+```
 
 ***
 
-#### Question 3
+> Question #3: What is the linear combination: $3u - 2v$? 
 
-**What is the linear combination: $3u - 2v$?**  
+***
 
 To solve this, we substitute for $u$ and $v$:  
 
@@ -56,17 +74,44 @@ $=[1.5, 1.5] - [6, -8]$
 $=[(1.5 - 6), (1.5 - -8)]$  
 $=[-4.5, 9.5]$  
 
-> The linear combination is [-4.5, 9.5].  
+**The linear combination is [-4.5, 9.5]. **  
+
+Checking with R:
+
+```{r}
+q3_1 <- c((3*0.5), (3*0.5))
+q3_2 <- c((2*3), (2*-4))
+
+q3_1 - q3_2
+```
 
 ***
 
-#### Question 4
+> Question #4: What is the angle between $u$ and $v$?
 
-**What is the angle between $u$ and $v$?**  
+***
 
-```{r}
-acos(-0.1414) * 180/pi
-```
+To solve this problem, we can refer to Module 1, which mentions that the angle between two vectors can be found by determining the dot-product between two vectors and their lengths. Since they are proportional to one another, we also know that the cosine of the angle between them is also proportional to these two attributes. Therefore, we can use the equation: $cos \space \theta = \frac{u.v}{||\vec{u}|| \times ||\vec{v}||}$
+
+With this in mind, we've already found $u.v = -0.5$, $||\vec{u}|| = \sqrt{0.5}$, and $||\vec{v}|| = 5$  
+
+We can substitute these values into our equation:
+
+$cos \space \theta = \frac{-0.5}{\sqrt{0.5} \times 5}$  
+$cos \space \theta = \frac{-0.5}{3.5355}$
+$cos \space \theta = -0.1414$
+
+To find the angle between u and v, we'll then have to solve for theta:
+
+$\theta = cos^{-1}(-0.1414)$, which is also the arccosine of this number.  
+$\theta = 1.712672 \space radians$
+
+Which can then be converted from radians to degrees by multiplying by $\frac{180}{\pi}$:
+
+$\theta = 1.712672 \space radians \times \frac{180}{\pi}$  
+$\theta = 98.13 \space degrees$
+
+**The angle between $u$ and $v$ is approximately 98.13 degrees.**  
 
 
 

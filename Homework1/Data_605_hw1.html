@@ -377,22 +377,21 @@ $(document).ready(function () {
 
 
 <hr />
-<div id="question-1" class="section level4">
-<h4>Question 1</h4>
-<p><strong>Calculate the dot product <span class="math inline">\(u.v\)</span> where <span class="math inline">\(u = [0.5; 0.5]\)</span> and <span class="math inline">\(v = [3; -4]\)</span>.</strong></p>
+<blockquote>
+<p>Question #1: Calculate the dot product <span class="math inline">\(u.v\)</span> where <span class="math inline">\(u = [0.5; 0.5]\)</span> and <span class="math inline">\(v = [3; -4]\)</span>.</p>
+</blockquote>
+<hr />
 <p>To take the dot product we’ll use the formula: <span class="math inline">\(v.w = v_{1}w_{1} + v_{2}w_{2} + v_{3}w_{3} + ... + v_{n}w_{n}\)</span></p>
 <p>Therefore, for our example we will do the following:</p>
 <p><span class="math inline">\(u.v = (0.5 * 3) + (0.5 * -4)\)</span><br />
 <span class="math inline">\(u.v = (1.5) + (-2)\)</span><br />
 <span class="math inline">\(u.v = -0.5\)</span></p>
+<p><strong>The dot product of <span class="math inline">\(u.v\)</span> is -0.5. </strong></p>
+<hr />
 <blockquote>
-<p>The dot product of <span class="math inline">\(u.v\)</span> is -0.5.</p>
+<p>Question #2: What are the lengths of <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span>? Please note that the mathematical notion of length of a vector is not the same as a computer science definition.</p>
 </blockquote>
 <hr />
-</div>
-<div id="question-2" class="section level4">
-<h4>Question 2</h4>
-<p><strong>What are the lengths of <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span>? Please note that the mathematical notion of length of a vector is not the same as a computer science definition.</strong></p>
 <p>In order to find the length of <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span>, we’ll have to use the following equation: <span class="math inline">\(||a|| = \sqrt{(\vec{a_{1}})^{2} + (\vec{a_{2}})^{2} }\)</span></p>
 <p>Which for our question is:</p>
 <p><span class="math inline">\(||u|| = \sqrt{0.5^{2} + 0.5^{2}}\)</span><br />
@@ -403,28 +402,35 @@ $(document).ready(function () {
 <span class="math inline">\(||v|| = \sqrt{9 + 16}\)</span><br />
 <span class="math inline">\(||v|| = \sqrt{25}\)</span><br />
 <span class="math inline">\(||v|| = 5\)</span></p>
+<p><strong>The length of <span class="math inline">\(u\)</span> is <span class="math inline">\(\sqrt{0.5}\)</span> or ~0.707106. The length of <span class="math inline">\(v\)</span> is 5. </strong></p>
+<hr />
 <blockquote>
-<p>The length of <span class="math inline">\(u\)</span> is <span class="math inline">\(\sqrt{0.5}\)</span> or ~0.707106. The length of <span class="math inline">\(v\)</span> is 5.</p>
+<p>Question #3: What is the linear combination: <span class="math inline">\(3u - 2v\)</span>?</p>
 </blockquote>
 <hr />
-</div>
-<div id="question-3" class="section level4">
-<h4>Question 3</h4>
-<p><strong>What is the linear combination: <span class="math inline">\(3u - 2v\)</span>?</strong></p>
 <p>To solve this, we substitute for <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span>:</p>
 <p><span class="math inline">\(=3[0.5, 0.5] - 2[3, -4]\)</span><br />
 <span class="math inline">\(=[1.5, 1.5] - [6, -8]\)</span><br />
 <span class="math inline">\(=[(1.5 - 6), (1.5 - -8)]\)</span><br />
 <span class="math inline">\(=[-4.5, 9.5]\)</span></p>
+<p><strong>The linear combination is [-4.5, 9.5]. </strong></p>
+<hr />
 <blockquote>
-<p>The linear combination is [-4.5, 9.5].</p>
+<p>Question #4: What is the angle between <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span>?</p>
 </blockquote>
 <hr />
-</div>
-<div id="question-4" class="section level4">
-<h4>Question 4</h4>
-<p><strong>What is the angle between <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span>?</strong></p>
-</div>
+<p>To solve this problem, we can refer to Module 1, which mentions that the angle between two vectors can be found by determining the dot-product between two vectors and their lengths. Since they are proportional to one another, we also know that the cosine of the angle between them is also proportional to these two attributes. Therefore, we can use the equation: <span class="math inline">\(cos \space \theta = \frac{u.v}{||\vec{u}|| \times ||\vec{v}||}\)</span></p>
+<p>With this in mind, we’ve already found <span class="math inline">\(u.v = -0.5\)</span>, <span class="math inline">\(||\vec{u}|| = \sqrt{0.5}\)</span>, and <span class="math inline">\(||\vec{v}|| = 5\)</span></p>
+<p>We can substitute these values into our equation:</p>
+<p><span class="math inline">\(cos \space \theta = \frac{-0.5}{\sqrt{0.5} \times 5}\)</span><br />
+<span class="math inline">\(cos \space \theta = \frac{-0.5}{3.5355}\)</span> <span class="math inline">\(cos \space \theta = -0.1414\)</span></p>
+<p>To find the angle between u and v, we’ll then have to solve for theta:</p>
+<p><span class="math inline">\(\theta = cos^{-1}(-0.1414)\)</span>, which is also the arccosine of this number.<br />
+<span class="math inline">\(\theta = 1.712672 \space radians\)</span></p>
+<p>Which can then be converted from radians to degrees by multiplying by <span class="math inline">\(\frac{180}{\pi}\)</span>:</p>
+<p><span class="math inline">\(\theta = 1.712672 \space radians \times \frac{180}{\pi}\)</span><br />
+<span class="math inline">\(\theta = 98.13 \space degrees\)</span></p>
+<p><strong>The angle between <span class="math inline">\(u\)</span> and <span class="math inline">\(v\)</span> is approximately 98.13 degrees.</strong></p>
 
 
 
