@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/570843/467d037b6fc842748083e053c9fa3ece
+bundleId: https://api.rpubs.com/api/v1/document/570843/467d037b6fc842748083e053c9fa3ece
+url: http://rpubs.com/zachalexander/570843
+when: 1580666117.37595

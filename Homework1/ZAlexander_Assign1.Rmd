@@ -20,10 +20,12 @@ To take the dot product we'll use the formula: $v.w = v_{1}w_{1} + v_{2}w_{2} + 
 Therefore, for our example we will do the following:  
 
 $u.v = (0.5 * 3) + (0.5 * -4)$  
+
 $u.v = (1.5) + (-2)$  
+
 $u.v = -0.5$  
 
-**The dot product of $u.v$ is -0.5.  **  
+**Answer: The dot product of $u.v$ is -0.5.  **  
 
 Checking with R:
 
@@ -44,16 +46,22 @@ In order to find the length of $u$ and $v$, we'll have to use the following equa
 Which for our question is:  
 
 $||u|| = \sqrt{0.5^{2} + 0.5^{2}}$  
+
 $||u|| = \sqrt{0.25 + 0.25}$  
+
 $||u|| = \sqrt{0.5}$  
+
 $||u|| = 0.70710678$  
 
 $||v|| = \sqrt{3^{2} + -4^{2}}$  
+
 $||v|| = \sqrt{9 + 16}$  
+
 $||v|| = \sqrt{25}$  
+
 $||v|| = 5$  
 
-**The length of $u$ is $\sqrt{0.5}$ or ~0.707106. The length of $v$ is 5. **  
+**Answer: The length of $u$ is $\sqrt{0.5}$ or approximately 0.707106. The length of $v$ is 5. **  
 
 Checking with R:
 
@@ -74,11 +82,14 @@ paste0('v is equal to ', q2_v)
 To solve this, we substitute for $u$ and $v$:  
 
 $=3[0.5, 0.5] - 2[3, -4]$  
+
 $=[1.5, 1.5] - [6, -8]$  
+
 $=[(1.5 - 6), (1.5 - -8)]$  
+
 $=[-4.5, 9.5]$  
 
-**The linear combination is [-4.5, 9.5]. **  
+**Answer: The linear combination is [-4.5, 9.5]. **  
 
 Checking with R:
 
@@ -104,20 +115,24 @@ With this in mind, we've already found $u.v = -0.5$, $||\vec{u}|| = \sqrt{0.5}$,
 We can substitute these values into our equation:  
 
 $cos \space \theta = \frac{-0.5}{\sqrt{0.5} \times 5}$   
+
 $cos \space \theta = \frac{-0.5}{3.5355}$  
+
 $cos \space \theta = -0.1414$  
 
 To find the angle between u and v, we'll then have to solve for theta:  
 
 $\theta = cos^{-1}(-0.1414)$, which is also the arccosine of this number.    
+
 $\theta = 1.712672 \space radians$  
 
 Which can then be converted from radians to degrees by multiplying by $\frac{180}{\pi}$:  
 
 $\theta = 1.712672 \space radians \times \frac{180}{\pi}$ 
+
 $\theta = 98.13 \space degrees$  
 
-**The angle between $u$ and $v$ is approximately 98.13 degrees.**  
+**Answer: The angle between $u$ and $v$ is approximately 98.13 degrees.**  
 
 
 Checking with R:
@@ -142,116 +157,155 @@ paste0('The angle is about ', round(theta_degrees, digits = 2), ' degrees.')
 
 ```{r}
 echelon <- function(a, b) {
-
-  mult_init <- a[1, 1]
+  
+  #zero pivot check/switch
+  
+  if(a[2,2] == 0) {
+    if(a[3,2] == 0){
+      print('There is either no solution or infinite solutions -- further calculations necessary')
+    } else {
+      # swap rows to get rid of zero pivot
+      temp_r2 <- a[2,]
+      a[2,] <- a[3,]
+      a[3,] <- temp_r2
+      
+      temp_r3 <- b[2,]
+      b[2,] <- b[3,]
+      b[3,] <- temp_r3
+    }
+  }
+  
+  # Check to see if there's a one in the first pivot
   
   if(a[1, 1] != 1) {
-    a[1, 1] <- a[1, 1] / mult_init
-    a[1, 2] <- a[1, 2] / mult_init
-    a[1, 3] <- a[1, 3] / mult_init
+    mult_init <- a[1, 1]
       
-    b[1, 1] <- b[1, 1] / mult_init
+    a[1,] <- a[1,] / mult_init
+    b[1,] <- b[1,] / mult_init
   }
 
-  
-  if(a[1, 1] == 1){
+  # First zero (R2)
 
-    # First zero (R2)
-
+  if(a[2, 1] != 0) {
     mult_1 <- a[2, 1]
 
-    a[2, 1] <-  a[2, 1] - (a[1, 1] * mult_1)
-    a[2, 2] <-  a[2, 2] - (a[1, 2] * mult_1)
-    a[2, 3] <-  a[2, 3] - (a[1, 3] * mult_1)
+    a[2,] <- a[2,] - (a[1,] * mult_1)
+    b[2,] <- b[2,] - (b[1,] * mult_1)
+  }
 
-    b[2, 1] <- b[2, 1] - (b[1, 1] * mult_1)
+  # Second zero (R3)
 
-    # Second zero (R3)
+  if(a[3, 1] != 0){
+    mult_2 <- a[3, 1]
 
-    if(a[3, 1] == 0){
-
-      print(TRUE)
-
-    } else {
-
-      mult_2 <- a[3, 1]
-
-      a[3, 1] <-  a[3, 1] - (a[1, 1] * mult_2)
-      a[3, 2] <-  a[3, 2] - (a[1, 2] * mult_2)
-      a[3, 3] <-  a[3, 3] - (a[1, 3] * mult_2)
-
-      b[3, 1] <- b[3, 1] - (b[1, 1] * mult_2)
-
-    }
-
-    # Third zero (R3)
-
-    if(a[3, 2] == 0){
-
-      print(TRUE)
-
-    } else {
-
-      mult_3 <- a[2, 2]
-      mult_4 <- a[3, 2]
-
-      a[3, 1] <-  (a[3, 1] * mult_3) - (a[2, 1] * mult_4)
-      a[3, 2] <-  (a[3, 2] * mult_3) - (a[2, 2] * mult_4)
-      a[3, 3] <-  (a[3, 3] * mult_3) - (a[2, 3] * mult_4)
-
-      b[3, 1] <- (b[3, 1] * mult_3) - (b[2, 1] * mult_4)
-
-    }
-
-
-    # solve for z, then y, then x
-
-    if(a[3, 3] == 1){
-      print(TRUE)
-      print(b[3, 1])
-    } else {
-
-      mult_5 <- a[3, 3]
-      a[3, 3] <- a[3, 3] / mult_5
-      b[3, 1] <- b[3, 1] / mult_5
-
-      z <- b[3, 1]
-      y <- ((b[2, 1]) - (a[2, 3]*z))/ (a[2, 2])
-      x <- b[1, 1] - (a[1, 2]*y) - (a[1, 3]*z)
-
-    }
-
-    final_matrix <- matrix(c(round(x, digits = 2), round(y, digits = 2), round(z, digits = 2)), nrow = 1, ncol = 3)
-    print(final_matrix)
-    
+    a[3,] <- a[3,] - (a[1,] * mult_2)
+    b[3,] <- b[3,] - (b[1,] * mult_2)
   }
   
+  # Third zero (R3)
   
-}
+  if(a[3, 2] != 0){
+    mult_3 <- a[2, 2]
+    mult_4 <- a[3, 2]
 
+    a[3,] <-  (a[3,] * mult_3) - (a[2,] * mult_4)
+    b[3,] <- (b[3,] * mult_3) - (b[2,] * mult_4)
+  }
+
+  # solve for z, then y, then x (back-substitution)
+    
+  if(a[3, 3] == 1){
+
+    z <- b[3, 1]
+    y <- ((b[2, 1]) - (a[2, 3]*z))/ (a[2, 2])
+    x <- b[1, 1] - (a[1, 2]*y) - (a[1, 3]*z)
+
+  } else {
+
+    mult_5 <- a[3, 3]
+    a[3, 3] <- a[3, 3] / mult_5
+    b[3, 1] <- b[3, 1] / mult_5
+
+    z <- b[3, 1]
+    y <- ((b[2, 1]) - (a[2, 3]*z))/ (a[2, 2])
+    x <- b[1, 1] - (a[1, 2]*y) - (a[1, 3]*z)
+
+  }
+  final_matrix <- matrix(c(round(x, digits = 2), round(y, digits = 2), round(z, digits = 2)), nrow = 1, ncol = 3)
+  print(final_matrix)
+    
+}
+```
+
+***
+
+**Solution to the problem set using my "echelon()" function:**  
+
+```{r}
+mat3 <- matrix(c(1, 2, -1, 1, -1, -2, 3, 5, 4), ncol = 3, nrow = 3)
+mat4 <- matrix(c(1, 2, 6), ncol = 1, nrow = 3)
+
+echelon(mat3, mat4)
+```
+
+**Checking my answer based on the built-in R function:**  
+
+```{r}
+solve(mat3, mat4)
 ```
 
 
+***
+
+**Tests on zero pivots using my "echelon()" function:**  
 
 ```{r}
+mat7 <- matrix(c(1, 0, 0, -1, 0, 2, 2, -1, -1), ncol = 3, nrow = 3)
+mat8 <- matrix(c(8, -11, -3), ncol = 1, nrow = 3)
 
-# one in A1
+echelon(mat7, mat8)
 
+mat14 <- matrix(c(2, 0, 0, 5, 0, 1, 1, -1, -1), ncol = 3, nrow = 3)
+mat15 <- matrix(c(0, 2, 3), ncol = 1, nrow = 3)
+
+echelon(mat14, mat15)
+```
+
+**Checking these answers with the built-in R function:**  
+
+```{r}
+solve(mat7, mat8)
+solve(mat14, mat15)
+```
+
+***
+
+**Tests with one in the first pivot using my "echelon()" function:**  
+
+```{r}
 mat1 <- matrix(c(1, 3, 0, 2, 8, 4, 1, 1, 1), ncol = 3, nrow = 3)
 mat2 <- matrix(c(2, 12, 2), ncol = 1, nrow = 3)
 
 echelon(mat1, mat2)
 
-mat3 <- matrix(c(1, 2, -1, 1, -1, -2, 3, 5, 4), ncol = 3, nrow = 3)
-mat4 <- matrix(c(1, 2, 6), ncol = 1, nrow = 3)
-
-echelon(mat3, mat4)
-
 mat11 <- matrix(c(1, 2, -3, -2, 1, 2, 3, 1, -2), ncol = 3, nrow = 3)
 mat12 <- matrix(c(7, 4, -10), ncol = 1, nrow = 3)
 
 echelon(mat11, mat12)
+```
 
+**Checking these answers with the built-in R function:**  
+
+```{r}
+solve(mat1, mat2)
+solve(mat11, mat12)
+```
+
+***
+
+**Tests without one in the first pivot using my "echelon()" function:**  
+
+```{r}
 # not one in A1
 
 mat5 <- matrix(c(2, 4, -2, 4, 9, -3, -2, -3, 7), ncol = 3, nrow = 3)
@@ -263,13 +317,27 @@ mat9 <- matrix(c(2, 4, -2, -4, -1, 2, 5, 0, -3), ncol = 3, nrow = 3)
 mat10 <- matrix(c(-33, -5, 19), ncol = 1, nrow = 3)
 
 echelon(mat9, mat10)
-
-# zero pivots example
-
-# mat7 <- matrix(c(2, 4, 0, 5, 10, 1, 1, 1, -1), ncol = 3, nrow = 3)
-# mat8 <- matrix(c(0, 2, 3), ncol = 1, nrow = 3)
-# 
-# echelon(mat7, mat8)
-
 ```
+
+**Checking these answers with the built-in R function:**  
+
+```{r}
+solve(mat5, mat6)
+solve(mat9, mat10)
+```
+
+**After doing a fair amount of tests on my "echelon()" function, it appears to satisfy all the requirements for Problem Set #2.**  
+
+
+
+
+
+
+
+
+
+
+
+
+
 
