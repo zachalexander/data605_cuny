@@ -16,11 +16,11 @@ output: html_document
 
 ***
 
-For our proof of $A^{T}A \neq AA^{T}$, we assume that A is not a square matrix, or $m \neq n$.  
+For our proof of $A^{T}A \neq AA^{T}$, we assume that A is a non-square matrix, or $m \neq n$.  
 
 Therefore, where $A$ has dimensions of an $m \times n$ matrix and $A^{T}$ has dimensions of an $n \times m$ matrix:  
 
-The product of $A^{T}A$ will be an $n \times n$ matrix and the product of $AA^{T}$ will be an $m \times m$ matrix. Since we know that $m \neq n$, then $A^{T}A \neq AA^{T}$. This will be true for all non-square matrix.  
+The product of $A^{T}A$ will be an $n \times n$ matrix and the product of $AA^{T}$ will be an $m \times m$ matrix. Since we know that $m \neq n$, then $A^{T}A \neq AA^{T}$. This will be true for all non-square matrices.  
 
 **Demonstration:**  
 
@@ -197,6 +197,8 @@ We can see that this does occur! Additionally, I added a check into the `factori
 
 I've also performed tests on this function for a non-square matrix, a $1 \times 1$, $2 \times 2$, and $4 \times 4$ matrix below to ensure it still works correctly:
 
+***
+
 **Non-square matrix example**
 
 ```{r}
@@ -204,18 +206,23 @@ nonsquare_mtx <- matrix(c(3, 2, 3, 1, 2, 5), nrow = 2, ncol = 3)
 factorizeM(nonsquare_mtx)
 ```
 
+***
+
 **$1 \times 1$ matrix example**
 ```{r}
 onebyone_mtx <- matrix(c(6), nrow = 1, ncol = 1)
 factorizeM(onebyone_mtx)
 ```
 
+***
 
 **$2 \times 2$ matrix example**
 ```{r}
 twobytwo_mtx <- matrix(c(2, 3, 4, 2), nrow = 2, ncol = 2)
 factorizeM(twobytwo_mtx)
 ```
+
+***
 
 **$4 \times 4$ matrix example**
 ```{r}

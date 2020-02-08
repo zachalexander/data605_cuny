@@ -384,9 +384,9 @@ $(document).ready(function () {
 <p>Question #1: Show that <span class="math inline">\(A^{T}A \neq AA^{T}\)</span> in general. (Proof and demonstration.)</p>
 </blockquote>
 <hr />
-<p>For our proof of <span class="math inline">\(A^{T}A \neq AA^{T}\)</span>, we assume that A is not a square matrix, or <span class="math inline">\(m \neq n\)</span>.</p>
+<p>For our proof of <span class="math inline">\(A^{T}A \neq AA^{T}\)</span>, we assume that A is a non-square matrix, or <span class="math inline">\(m \neq n\)</span>.</p>
 <p>Therefore, where <span class="math inline">\(A\)</span> has dimensions of an <span class="math inline">\(m \times n\)</span> matrix and <span class="math inline">\(A^{T}\)</span> has dimensions of an <span class="math inline">\(n \times m\)</span> matrix:</p>
-<p>The product of <span class="math inline">\(A^{T}A\)</span> will be an <span class="math inline">\(n \times n\)</span> matrix and the product of <span class="math inline">\(AA^{T}\)</span> will be an <span class="math inline">\(m \times m\)</span> matrix. Since we know that <span class="math inline">\(m \neq n\)</span>, then <span class="math inline">\(A^{T}A \neq AA^{T}\)</span>. This will be true for all non-square matrix.</p>
+<p>The product of <span class="math inline">\(A^{T}A\)</span> will be an <span class="math inline">\(n \times n\)</span> matrix and the product of <span class="math inline">\(AA^{T}\)</span> will be an <span class="math inline">\(m \times m\)</span> matrix. Since we know that <span class="math inline">\(m \neq n\)</span>, then <span class="math inline">\(A^{T}A \neq AA^{T}\)</span>. This will be true for all non-square matrices.</p>
 <p><strong>Demonstration:</strong></p>
 <p>We have a <span class="math inline">\(3 \times 2\)</span> matrix, <span class="math inline">\(A\)</span>:</p>
 <pre class="r"><code>A &lt;- matrix(c(1, 2, 3, 4, 5, 6), nrow = 3, ncol = 2)
@@ -572,10 +572,12 @@ factorizeM(mat3)</code></pre>
 ## [3,] TRUE TRUE TRUE</code></pre>
 <p>We can see that this does occur! Additionally, I added a check into the <code>factorizeM()</code> function to check our final matrices to prove <span class="math inline">\(A = LU\)</span>.</p>
 <p>I’ve also performed tests on this function for a non-square matrix, a <span class="math inline">\(1 \times 1\)</span>, <span class="math inline">\(2 \times 2\)</span>, and <span class="math inline">\(4 \times 4\)</span> matrix below to ensure it still works correctly:</p>
+<hr />
 <p><strong>Non-square matrix example</strong></p>
 <pre class="r"><code>nonsquare_mtx &lt;- matrix(c(3, 2, 3, 1, 2, 5), nrow = 2, ncol = 3)
 factorizeM(nonsquare_mtx)</code></pre>
 <pre><code>## [1] &quot;This is a non-square matrix.&quot;</code></pre>
+<hr />
 <p><strong><span class="math inline">\(1 \times 1\)</span> matrix example</strong></p>
 <pre class="r"><code>onebyone_mtx &lt;- matrix(c(6), nrow = 1, ncol = 1)
 factorizeM(onebyone_mtx)</code></pre>
@@ -594,6 +596,7 @@ factorizeM(onebyone_mtx)</code></pre>
 ## [[4]]
 ##      [,1]
 ## [1,] TRUE</code></pre>
+<hr />
 <p><strong><span class="math inline">\(2 \times 2\)</span> matrix example</strong></p>
 <pre class="r"><code>twobytwo_mtx &lt;- matrix(c(2, 3, 4, 2), nrow = 2, ncol = 2)
 factorizeM(twobytwo_mtx)</code></pre>
@@ -609,6 +612,7 @@ factorizeM(twobytwo_mtx)</code></pre>
 <pre><code>##      [,1] [,2]
 ## [1,] TRUE TRUE
 ## [2,] TRUE TRUE</code></pre>
+<hr />
 <p><strong><span class="math inline">\(4 \times 4\)</span> matrix example</strong></p>
 <pre class="r"><code>fourbyfour_mtx &lt;- matrix(c(2, 3, 4, 2, 8, 2, 3, 0, 3, 5, 7, 3, 4, 3, 6, 7), nrow = 4, ncol = 4)
 factorizeM(fourbyfour_mtx)</code></pre>
