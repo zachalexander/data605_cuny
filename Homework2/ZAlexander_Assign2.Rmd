@@ -1,0 +1,224 @@
+---
+title: "DATA 605 - Homework 2"
+author: "Zach Alexander"
+date: "2/8/2020"
+output: html_document
+---
+
+
+***
+
+### PROBLEM SET #1
+
+***
+
+> Question #1: Show that $A^{T}A \neq AA^{T}$ in general. (Proof and demonstration.) 
+
+***
+
+For our proof of $A^{T}A \neq AA^{T}$, we assume that A is not a square matrix, or $m \neq n$.  
+
+Therefore, where $A$ has dimensions of an $m \times n$ matrix and $A^{T}$ has dimensions of an $n \times m$ matrix:  
+
+The product of $A^{T}A$ will be an $n \times n$ matrix and the product of $AA^{T}$ will be an $m \times m$ matrix. Since we know that $m \neq n$, then $A^{T}A \neq AA^{T}$. This will be true for all non-square matrix.  
+
+**Demonstration:**  
+
+We have a $3 \times 2$ matrix, $A$:
+
+```{r}
+A <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 3, ncol = 2)
+A
+```
+
+Therefore, $A^{T}$ is:  
+
+```{r}
+At <- t(A)
+At
+```
+
+When we test to see whether the equation of $A^{T}A \neq AA^{T}$ is true, we find the following:
+
+```{r}
+prodAAt <- A%*%At
+prodAAt
+```
+
+Where `prodAAt` is a $3 \times 3$ matrix. And:
+
+```{r}
+prodAtA <- At%*%A
+prodAtA
+```
+
+Where `prodAtA` is a $2 \times 2$ matrix. We can see that `prodAAt` and `prodAtA` are not equal.
+
+***
+
+> Question #2: For a special type of square matrix $A$, we get $A^{T}A = AA^{T}$. Under what conditions could this be true? (Hint: The Identity matrix I is an example of such a matrix).
+
+***
+
+For a special type of square matrix, where $A = A^{T}$, this condition could be true. Taking the Identity matrix, $I$ as an example:
+
+\begin{bmatrix}
+1 & 0 & 0\\ 
+0 & 1 & 0\\ 
+0 & 0 & 1
+\end{bmatrix}
+
+For $I$ above, we can see that $I^{T}$ would be the same as $I$. This also is true for other square matrices where $A = A^{T}$.  
+
+**Demonstration:**  
+
+```{r}
+mat1 <- matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1), nrow = 3, ncol = 3)
+mat1
+
+mat1T <- t(mat1)
+mat1T
+```
+
+Another example is:  
+
+```{r}
+mat2 <- matrix(c(1, 6, -10, 6, 12, 5, -10, 5, 1), nrow = 3, ncol = 3)
+mat2
+
+mat2T <- t(mat2)
+mat2T
+```
+
+Therefore, we can prove from these examples that these special square matrices make $A^{T}A = AA^{T}$ true:
+
+```{r}
+mat1T%*%mat1 == mat1%*%mat1T
+mat2T%*%mat2 == mat2%*%mat2T
+```
+
+***
+
+### PROBLEM SET #2
+
+***
+
+> Write an R function to factorize a square matrix $A$ into $LU$ or $LDU$, whichever you prefer.
+
+***
+
+In order to work through this problem, we need to keep in mind that $A = LU$. Therefore, we can write our function as follows:
+
+Since I developed similar code to this last week to solve for row echelon form (and created an Upper Triangular Matrix), I'll adapt this to start my a `factorizeInitial()` function:
+
+```{r}
+factorizeInitial <- function(a){
+  u <- a
+  l <- matrix(c(1, 0, 0, 0, 1, 0, 0, 0, 1), nrow = 3, ncol = 3)
+  
+  if(a[2, 1] != 0) {
+    mult_1 <- -(u[2, 1] / u[1, 1])
+
+    u[2,] <- (u[1,] * mult_1) + u[2,]
+    l[2, 1] <- -mult_1
+  }
+
+  if(a[3, 1] != 0) {
+    mult_2 <- -(u[3, 1] / u[1, 1])
+
+    u[3,] <- (u[1,] * mult_2) + u[3,]
+    l[3, 1] <- -mult_2
+  }
+
+  if(a[3, 2] != 0) {
+    mult_3 <- -(u[3, 2] / u[2, 2])
+
+    u[3,] <- (u[2,] * mult_3) + u[3,]
+    l[3, 2] <- -mult_3
+  }
+  print(a)
+  print(l)
+  print(u)
+}
+```
+
+Initial test:
+
+```{r}
+mat3 <- matrix(c(2, 1, -6, 4, -4, -9, -4, 3, 5), nrow = 3, ncol = 3)
+
+factorizeInitial(mat3)
+```
+
+Great! It looks like I have it working for a $3 \times 3$ matrix. However, the problem would like us to account for different sized square matrices. I'm also seeing patterns within my initial function, so I did my best to make the code more efficient. In the function `factorizeM()`, I was able to do so below:
+
+```{r}
+factorizeM <- function(a){
+  u <- a
+  m <- dim(a)[1]
+  n <- dim(a)[2]
+  l <- diag(m)
+  
+  # We need to first check that a is a square matrix
+  if (m != n) {
+    return('This is a non-square matrix.')
+  }
+  
+  # We then need to check if it's a one by one matrix
+  if (m==1 & n==1) {
+    return(list(a, l, u, a == l%*%u))
+  }
+  
+  for(i in 2:m){
+    for(j in 1:(i-1)){
+      mult <- -(u[i, j] / u[j, j])
+      u[i,] <- (u[j,] * mult) + u[i,]
+      l[i, j] <- -mult
+    }
+  }
+  print(a)
+  print(u)
+  print(l)
+  
+  # check to ensure it is correct
+  a == l%*%u
+}
+```
+
+Let's test our `factorizeM()` function to make sure we get the same matrices as `factorizeInitial()`:  
+
+```{r}
+mat3 <- matrix(c(2, 1, -6, 4, -4, -9, -4, 3, 5), nrow = 3, ncol = 3)
+
+factorizeM(mat3)
+```
+
+We can see that this does occur! Additionally, I added a check into the `factorizeM()` function to check our final matrices to prove $A = LU$.
+
+I've also performed tests on this function for a non-square matrix, a $1 \times 1$, $2 \times 2$, and $4 \times 4$ matrix below to ensure it still works correctly:
+
+**Non-square matrix example**
+
+```{r}
+nonsquare_mtx <- matrix(c(3, 2, 3, 1, 2, 5), nrow = 2, ncol = 3)
+factorizeM(nonsquare_mtx)
+```
+
+**$1 \times 1$ matrix example**
+```{r}
+onebyone_mtx <- matrix(c(6), nrow = 1, ncol = 1)
+factorizeM(onebyone_mtx)
+```
+
+
+**$2 \times 2$ matrix example**
+```{r}
+twobytwo_mtx <- matrix(c(2, 3, 4, 2), nrow = 2, ncol = 2)
+factorizeM(twobytwo_mtx)
+```
+
+**$4 \times 4$ matrix example**
+```{r}
+fourbyfour_mtx <- matrix(c(2, 3, 4, 2, 8, 2, 3, 0, 3, 5, 7, 3, 4, 3, 6, 7), nrow = 4, ncol = 4)
+factorizeM(fourbyfour_mtx)
+```
