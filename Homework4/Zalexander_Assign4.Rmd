@@ -1,0 +1,203 @@
+---
+title: 'DATA 605 - Homework #4'
+author: "Zach Alexander"
+date: "2/22/2020"
+output: html_document
+---
+
+
+***
+
+### PROBLEM SET #1
+
+***
+
+> In this problem, we'll verify using R that SVD and Eigenvalues are related as worked out in the weekly module. Given a $3 \times 2$ matrix $A$ (see below), write code in R to compute $X = AA^{T}$ and $Y = A^{T}A$. Then, compute the eigenvalues and eigenvectors of $X$ and $Y$ using the built-in commands in R. Then, compute the left-singular, singular values, and right-singular vectors of $A$ using the `svd()` command. Examine the two sets of singular vectors and show that they are indeed eigenvectors of $X$ and $Y$. In addition, the two non-zero eigenvalues (the 3rd value will be very close to zero, if not zero) of both $X$ and $Y$ are the same and are squares of the non-zero singular values of $A$.
+
+\begin{equation}
+  A = 
+  \begin{bmatrix}
+  1 & 2 & 3\\ 
+  -1 & 0 & 4\\
+  \end{bmatrix}
+\end{equation}
+
+***
+
+First, let's create matrix $A$ and then find the transpose of $A$ ($A^{T}$):
+
+##### Matrix A
+```{r}
+A <- matrix(c(1, 2, 3, -1, 0, 4), nrow=2, ncol=3, byrow = TRUE)
+A
+```
+
+***
+
+##### Transpose of A
+```{r}
+A_transpose <- t(A)
+A_transpose
+```
+
+***
+
+##### Finding X and Y
+
+Next, we can find $X$ and $Y$:
+
+```{r}
+X = A%*%A_transpose
+X
+
+Y = A_transpose%*%A
+Y
+```
+
+***
+
+##### Finding the eigenvalues and eigenvectors of X and Y
+
+We can now compute the eigenvalues and eigenvectors of $X$:
+```{r}
+eigenX <- eigen(X)
+eigenX
+```
+
+We can now compute the eigenvalues and eigenvectors of $Y$:
+```{r}
+eigenY <- eigen(Y)
+eigenY
+```
+
+Since both $X$ and $Y$ are symmetric matrices, their eigenvectors can be chosen to be orthonormal (tested below).
+```{r}
+# double checks they are symmetric matrices
+isSymmetric(X)
+isSymmetric(Y)
+
+# orthonormal check
+eigenX$vectors[1,]%*%eigenX$vectors[1,]
+eigenX$vectors[1,]%*%eigenX$vectors[2,]
+eigenY$vectors[1,]%*%eigenY$vectors[1,]
+round(eigenY$vectors[1,]%*%eigenY$vectors[2,])
+round(eigenY$vectors[1,]%*%eigenY$vectors[3,])
+```
+
+***
+
+##### Run Singular Value Decomposition
+
+We can now use the `svd()` command to compute the left-singular, singular values, and right-singular vectors of $A$:  
+```{r}
+A_svd <- svd(A, nu=nrow(A), nv=ncol(A))
+A_svd
+
+singular_values <- svd(A, nu=nrow(A), nv=ncol(A))$d
+left_singular_vectors <- svd(A, nu=nrow(A), nv=ncol(A))$u
+right_singular_vectors <- svd(A, nu=nrow(A), nv=ncol(A))$v
+```
+
+After running the `svg()` command, I noticed that with the exception of some values differing by a factor of -1, the eigenvectors of $X$ equal the left-singular vectors of $A$. Similarly, the eigenvectors of $Y$ seemed to equal the right-singular vectors of $A$. With a bit of rounding, we can see that this is the case in R when we test to see if these comparisons are equal to one another:
+
+```{r}
+round(abs(left_singular_vectors), digits = 10) == round(abs(eigenX$vectors), digits = 10)
+round(abs(right_singular_vectors), digits = 10) == round(abs(eigenY$vectors), digits = 10)
+```
+
+This shows that the two sets of singular vectors are eigenvectors of $X$ and $Y$.  
+
+As we can see, the two non-zero eigenvalues of both $X$ and $Y$ are the same:  
+
+```{r}
+eigenX$values
+eigenY$values
+
+round(eigenX$values[1], digits = 6) == round(eigenY$values[1], digits = 6)
+round(eigenX$values[2], digits = 6) == round(eigenY$values[2], digits = 6)
+```
+
+And are squares of the non-zero singular values of $A$:  
+
+```{r}
+round((singular_values^2), digits = 6) == round(eigenX$values, digits = 6)
+round((singular_values^2), digits = 6) == round(eigenY$values[1:2], digits = 6)
+```
+
+
+***
+
+### PROBLEM SET #2
+
+***
+
+> Using the procedure outlined in Section 1 of the weekly handout, write a function to compute the inverse of a well-conditioned full-rank square matrix using co-factors. In order to compute the co-factors, you may use built-in commands to compute the determinant.
+
+For this function, it'll have the following signature of `B = myinverse(A)`, where $A$ is a matrix and $B$ is its inverse and $A \times B = I$. The off-diagonal elements of $I$ should be close to zero, if not zero. Likewise, the diagonal elements should be close to 1, if not 1. It also must use co-factors and determinant of $A$ to compute the inverse.
+
+I'll utilize the equation, $A^{-1} = C^{T}/ det(A)$ to compute the inverse:  
+
+```{r}
+myinverse <- function(A) {
+  # find the determinant of A
+  determinantA <- det(A)
+  
+  if(determinantA == 0){
+    return('This matrix is not invertible.')
+  }
+  
+  # create an empty matrix to fill with co-factors, same dimensions as A
+  C <- matrix(NA, nrow = dim(A)[1], ncol = dim(A)[2])
+  for(i in 1:dim(C)[1]) {
+    for(j in 1:dim(C)[2]){
+      #calculate the cofactor for A_ij
+      #using -i and -j here will automatically eliminate rows/columns not used in determinant calculation
+      C[i,j] <- (-1)^(i+j) * det(A[-i,-j])
+    }
+  }
+  # find the transpose of C
+  Ct <- t(C)
+  # calculate the inverse of A
+  inverse <- Ct / determinantA
+  return(inverse)
+}
+```
+
+After creating the function, we can do some testing by generating a random 5 by 5 matrix, and storing the inverse of this matrix in B:  
+```{r}
+A <- matrix(sample(0:9, 25,  replace = TRUE), nrow=5, ncol=5)
+B <- myinverse(A)
+```
+
+Then, to ensure that we have satisfied our equation of $A \times B = I$, we should get the Identity Matrix, something close to the Identity Matrix when we do our calculation.
+
+\begin{equation}
+  A \times B = I, where
+  \space
+  I = 
+  \begin{bmatrix}
+    1 & 0 & 0 & 0 & 0\\ 
+    0 & 1 & 0 & 0 & 0\\ 
+    0 & 0 & 1 & 0 & 0\\ 
+    0 & 0 & 0 & 1 & 0\\ 
+    0 & 0 & 0 & 0 & 1\\ 
+  \end{bmatrix}
+  \space
+  therefore, 
+  \space
+  A \times B = 
+  \begin{bmatrix}
+    1 & 0 & 0 & 0 & 0\\ 
+    0 & 1 & 0 & 0 & 0\\ 
+    0 & 0 & 1 & 0 & 0\\ 
+    0 & 0 & 0 & 1 & 0\\ 
+    0 & 0 & 0 & 0 & 1\\ 
+  \end{bmatrix}
+\end{equation}
+
+```{r}
+I <- A %*% B
+I
+```
+
+
