@@ -1,0 +1,358 @@
+---
+title: 'DATA 605 - Homework #6'
+author: "Zach Alexander"
+date: "3/7/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+***
+
+> **Question #1**: A box contains 54 red marbles, 9 white marbles, and 75 blue marbles. If a marble is randomly selected from the box, what is the probability that it is red or blue? Express your answer as a fraction or a decimal number rounded to four decimal places.
+
+Since there are 138 total marbles in the box, and there is only one selection from the box, the probability can be calculated by:
+
+$P(R \cap B) = \frac{N(R) + N(B)}{N(Total)}$  
+
+
+```{r}
+red <- 54
+white <- 9
+blue <- 75
+box <- sum(red, white, blue)
+
+red_or_blue <- sum(red, blue)
+
+round(red_or_blue / box, digits = 4)
+```
+
+**ANSWER: Therefore, the probability of randomly selecting a red or blue marble from the box is $\frac{(54) + (75)}{138}$, or 0.9348.**
+
+***
+
+> **Question #2**: You are going to play mini golf. A ball machine that contains 19 green golf balls, 20 red golf balls, 24 blue golf balls, and 17 yellow golf balls, randomly gives you your ball. What is the probability that you end up with a red golf ball? Express your answer as a simplified fraction or a decimal rounded to four decimal places.
+
+Since there are 80 total golf balls in the ball machine, and there is only one selection from the machine, the probability can be calculated by:
+
+$P(R) = \frac{N(R)}{N(Total)}$  
+
+```{r}
+green <- 19
+red <- 20
+yellow <- 17
+blue <- 24
+ball_machine <- sum(green, red, yellow, blue)
+
+round(red / ball_machine, digits = 4)
+```
+
+**ANSWER: Therefore, the probability of randomly receiving a red golf ball from the machine is $\frac{20}{80} = \frac{1}{4}$, or 0.2500.**
+
+***
+
+> **Question #3**: A pizza delivery company classifies its customers by gender and location of residence. The research department has gathered data from a random sample of 1399 customers. The data is summarized in the table below. What is the probability that a customer is not male or does not live with parents? Write your answer as a fraction or a decimal number rounded to four decimal places.
+
+| Gender and Residence of Customers |       |         |
+|-----------------------------------|-------|---------|
+|                                   | Males | Females |
+| Apartment                         | 81    | 228     |
+| Dorm                              | 116   | 79      |
+| With Parent(s)                    | 215   | 252     |
+| Sorority/Fraternity House         | 130   | 97      |
+| Other                             | 129   | 72      |
+
+
+To solve this problem, we first will have to find the probability that a customer is not male (female):
+
+$P(not \space male) = \frac{N(not \space male)}{N(total \space customers)}$ 
+
+```{r}
+not_male <- sum(228, 79, 252, 97, 72)
+total_customers <- 1399
+
+not_male / total_customers
+```
+
+Therefore, $P(not \space male) = \frac{728}{1399}$ or roughly 0.5204.
+
+Next, we need to find the probability of customers that do not live with their parent(s).
+
+$P(not \space livewparent) = \frac{N(not \space livewparent)}{N(total \space customers)}$ 
+
+```{r}
+not_live_w_parents <- sum(81, 116, 228, 79, 130, 97, 129, 72)
+
+not_live_w_parents / total_customers
+```
+
+Therefore, $P(not \space livewparents) = \frac{932}{1399}$ or roughly 0.6662.
+
+Next, we need to factor in the probability where customers are not male *and* not living with their parents, in order to not double count when we find the final probability:
+
+```{r}
+not_live_w_parents_and_not_male <- sum(228, 79, 97, 72)
+
+not_live_w_parents_and_not_male / total_customers
+```
+
+Finally, since we want to find the probability of customers that are not male *or* live with their parent(s), we can do the following:  
+
+$P(not \space male \space \cap \space not \space livewparent ) = P(not \space livewparent) + P(not \space male) - P(not \space male \space \cup not \space livewparent)$  
+
+$P(not \space male \space \cap \space not \space livewparent ) = 0.6662 + 0.5204 - 0.3402 = 0.8463$
+
+```{r}
+p_not_male_and_not_live_w_parents <- not_male + not_live_w_parents - not_live_w_parents_and_not_male
+round(p_not_male_and_not_live_w_parents / total_customers, digits = 4)
+```
+
+**ANSWER: The probability that a customer is not male and does not live with their parent(s) is about 0.8463.**  
+
+***
+
+> **Question #4**: Determine if the following events are independent -- Going to the gym. Losing weight.
+
+**ANSWER: These events are A) Dependent.**
+
+***
+
+> **Question #5**: A veggie wrap at City Subs is composed of 3 different vegetables and 3 different condiments wrapped up in a tortilla. If there are 8 vegetables, 7 condiments, and 3 types of tortilla available, how many different veggie wraps can be made?
+
+Since it appears that order does not matter for this question, we can use the following combinations equation:
+
+$C(n, k) = \frac{n!}{(n-k!)k!}$
+
+Therefore, we will need to find the number of combinations possible for the vegetables, condiments and tortillas, and then multiply them together to obtain the total number of different veggie wraps that can be made.
+
+$C(vegetables) = \frac{8!}{(8-3!)3!}$  
+$C(condiments) = \frac{7!}{(7-3!)3!}$  
+$C(tortillas) = \frac{3!}{(3-1!)1!}$  
+
+$C(vegetables) \times C(condiments) \times C(tortillas) = C(wraps)$
+
+```{r}
+C_veg <- factorial(8) / (factorial(8-3) * factorial(3))
+C_cond <- factorial(7) / (factorial(7-3) * factorial(3))
+C_tort <- factorial(3) / (factorial(3-1) * factorial(1))
+
+C_veg * C_cond * C_tort
+```
+
+**ANSWER: In the end, it appears that there are 5880 different veggie wraps that can be made.**
+
+***
+
+> **Question #6**: Determine if the following events are independent -- Jeff runs out of gas on the way to work. Liz watches the evening news.
+
+**ANSWER: These events are B) Independent.**
+
+***
+
+> **Question #7**: The newly elected president needs to decide the remaining 8 spots available in the cabinet he/she is appointing. If there are 14 eligible candidates for these positions (where rank matters), how many different ways can the members of the cabinet be appointed?
+
+Since rank matters here, we need to use the following combination formula:
+
+$C(n, k) = \frac{n!}{(n-k)!}$  
+
+$C(cabinet) = \frac{14!}{(14-8)!}$  
+
+```{r}
+factorial(14) / factorial(14-8)
+```
+
+**ANSWER: It appears that there are 121,080,960 different ways the members of the cabinet can be appointed.**  
+
+***
+
+> **Question #8**: A bag contains 9 red, 4 orange, and 9 green jellybeans. What is the probability of reaching into the bag and randomly withdrawing 4 jellybeans such that the number of red ones is 0, the number of orange ones is 1, and the number of green ones is 3? Write your answer as a fraction or a decimal number rounded to four decimal places.
+
+In order to solve this problem, we need to break it down in a few steps. First, we'll find the number of combinations possible from drawing 4 jellybeans from a bag that contains $9 + 4 + 9 = 22 \space total \space jellybeans$. This is simply:
+
+$C(22, 4) = \frac{22!}{(22-4!)4!}$  
+
+```{r}
+C_jelly <- factorial(22) / (factorial(22-4) * factorial(4))
+```
+
+It looks like there are 7315 different ways to pull 4 jellybeans from a bag of 22 total jellybeans.
+
+Then, we can find the number of ways to pull 0 red jellybeans, 1 orange jellybean, and 3 green jellybeans from the bag:
+
+$C(red) = \frac{9!}{(9-0!)0!} = 1$  
+$C(orange) = \frac{4!}{(4-1!)1!} = 4$  
+$C(green) = \frac{9!}{(9-3!)3!} = 84$  
+
+```{r}
+C_red <- factorial(9) / (factorial(9-0) * factorial(0))
+C_orange <- factorial(4) / (factorial(4-1) * factorial(1))
+C_green <- factorial(9) / (factorial(9-3) * factorial(3))
+```
+
+Finally, we'll want to multiply the number of ways we can pull each of these colors given the number of jellybeans of each color in the bag and our desired outcome, and divide this by the combinations of drawing 4 different jellybeans from the bag:
+
+$\frac{1 \times 4 \times 8}{7315}$
+
+```{r}
+(C_red * C_orange * C_green) / C_jelly
+```
+
+**ANSWER: The probability of this specific combination of drawing 4 jellybeans such that the number of red ones is 0, the number of orange ones is 1, and the number of green ones is 3 is approximately 0.0459.**  
+
+***
+
+> **Question #9**: Evaluate the following expression:
+
+$\frac{11!}{7!}$  
+
+$\frac{11 \times 10 \times 9 \times 8 \times 7 \times 6 \times 5 \times 4 \times 3 \times 2 \times 1}{7 \times 6 \times 5 \times 4 \times 3 \times 2 \times 1}$  
+
+$11 \times 10 \times 9 \times 8 = 7920$
+
+Checking in R:  
+```{r}
+factorial(11) / factorial(7)
+```
+
+**ANSWER: The answer is 7920.**  
+
+***
+
+> **Question #10**: Describe the complement of the given event -- 67% of subscribers to a fitness magazine are over the age of 34.
+
+**ANSWER: The complement of this given event is that 33% of subscribers to a fitness magazine are 34 years old or younger.**  
+
+***
+
+> **Question #11**: If you throw exactly three heads in four tosses of a coin you win $97. If not, you pay me $30.  
+**Step 1:** Find the expected values of the proposition. Round your answer to two decimal places.
+
+First we'll need to find the probability of throwing exactly three heads in four tosses of a coin. To do this, we can use the equation we've used in past exercises:
+
+$C(n, k) = \frac{n!}{(n-k!)k!}$  
+$C(4,3) = \frac{4!}{(4-3!)3!}$
+
+```{r}
+t <- 2^4
+three_heads <- (factorial(4) / (factorial(4-3)*factorial(3)))
+```
+
+Since there are 16 total outcomes for tossing a coin four times, and there are 4 instances where you would have three heads out of the four tosses, the probability is $\frac{4}{16}$ or 0.25.
+
+With this in mind, we can then find the expected values of the proposition:
+
+$$E(X) = \sum_{n=1}^{\infty} x_{i} * p_{i}$$  
+
+$(97 * 0.25) + (-30 * 0.75)$
+
+Which computes to:
+
+```{r}
+(97 * 0.25) + (-30 * 0.75)
+```
+
+**ANSWER: Therefore, the expected value of the proposition is $1.75.**  
+
+> **Step 2:** If you played this game 559 times how much would you expect to win or lose? (Losses must be entered as negative.
+
+Since you are replicating this expected value 559 times, the outcome will be:
+
+```{r}
+1.75 * 559
+```
+
+**ANSWER: You would expect to win $978.25 if you played this game 559 times.**  
+
+***
+
+> **Question 12**: Flip a coin 9 times. If you get 4 tails or less, I will pay you $23. Otherwise you pay me $26.  
+**Step 1**: Find the expected value of the proposition. Round your answer to two decimal places.
+
+For this proposition, since we want to find the outcomes and combinations for 4 tails or less, we can use the binomial distribution formula:  
+
+$p(x) = {9 \choose 4}+{9 \choose 3}+{9 \choose 2}+{9 \choose 1}+{9 \choose 0} * p^{x}(1-p)^{n-x}$
+
+
+```{r}
+p <- 0.5
+n <- 9
+x <- 4
+
+round((((p)^x) * ((1-p)^(n-x))) * ((factorial(9) / (factorial(9-4)*factorial(4))) + (factorial(9) / (factorial(9-3)*factorial(3))) + (factorial(9) / (factorial(9-2)*factorial(2))) + (factorial(9) / (factorial(9-1)*factorial(1)))), digits = 2)
+
+pbinom(4, 9, 0.5)
+```
+
+Computing it two different ways, it looks like the probability is 0.5 for getting 4 tails or less from flipping a coin 9 times.
+
+Therefore, the expected value would be:  
+
+$$E(X) = \sum_{n=1}^{\infty} x_{i} * p_{i}$$  
+
+$(23 * 0.5) + (-26 * 0.5)$
+
+Which computes to:
+
+```{r}
+(23 * 0.5) + (-26 * 0.5)
+```
+
+**ANSWER: Therefore, the expected value of the proposition is -$1.50.**  
+
+> **Step 2:** If you played this game 994 times how much would you expect to win or lose? (Losses must be entered as negative.
+
+If this expected value was for one game, we would replicate this for 994 games by:
+
+```{r}
+994 * -1.5
+```
+
+**ANSWER: You would expect to lose $1491 if you played this game 994 times.**  
+
+***
+
+> **Question 13**: The sensitivity and specificity of the polygraph has been a subject of study and debate for years. A 2001 study of the use of polygraph for screening purposes suggested that the probability of detecting a liar was 0.59 (sensitivity) and that the probability of detecting a "truth teller" was 0.90 (specificity). We estimate that about 20% of individuals selected for the screening polygraph will lie.
+**a)** What is the probability that an individual is actually a liar given that the polygraph detected him/her as such? (Show me the table or the formulaic solution or both)
+
+Since this is a conditional probability question, we can break it down by using the following table and formula:
+
++ The probabilities are $P(Truth) = 0.80$, $P(Lie) = 0.200$.  
++ Additionally, we know that the probability of a positive reading and someone lies is $P(Lie) * P(+ test) = 0.20 * 0.59 = 0.118$ and the probability of a negative reading and someone lies is $P(Lie) * P(- test) = 0.20 * 0.41 = 0.082$.  
++ Conversely, the probability of a positive reading while someone tells the truth is $P(Truth) * P(+ test) = 0.80 * 0.10 = 0.080$ and the probability of a negative reading and someone tells the truth is $P(Truth) * P(- test) = 0.80 * 0.90 = 0.720$.  
+
+With these in mind, we can calculate the conditional probabilities by adding the rows and place them in the following table (in totals):
+
+| Conditions                        | Truth | Lie     |Totals |
+|-----------------------------------|-------|---------|-------|
+| Positive                          | 0.080 | 0.118   | 0.198 |
+| Negative                          | 0.720 | 0.082   | 0.802 |
+| Totals                            | 0.800 | 0.200   | 1.000 |
+
+Therefore, we can now address the question by using the following formula:
+
+$P(Lie \space | \space +test) = \frac{P(Lie \space \cap \space +test)}{P(+test)} = \frac{0.118}{0.198} = 0.5959$
+
+**ANSWER: The probability that an individual is actually a liar given that the polygraph detected him/her as such is about 0.5959.**  
+
+
+> **b)** What is the probability that an individual is actually a truth-teller given that the polygraph detected him/her as such? (Show me the table or the formulaic solution or both)
+
+Using the table above from the previous question, we can calculate this conditional probability by doing the following calculation:  
+
+$P(Truth \space | \space -test) = \frac{P(Truth \space \cap \space -test)}{P(+test)} = \frac{0.720}{0.802} = 0.8977$  
+
+**ANSWER: The probability that an individual is actually a truth-teller given that the polygraph detected him/her as such is about 0.8977.**  
+
+> **c)** What is the probability that a randomly selected individual is either a liar or was identified as a liar by the polygraph? (Show me the table or the formulaic solution or both)
+
+Using the table above, and given that this is asking for "either", we can use the following formula:  
+$P(Lie \space \cup \space +test)= P(Lie) + P(+test) - P(Lie \space \cap \space +test) = 0.2 + 0.198 - 0.118 = 0.28$  
+
+**ANSWER: The probability that a randomly selected individual is either a liar or was identified as a liar by the polygraph is 0.28.** 
+
+
+
