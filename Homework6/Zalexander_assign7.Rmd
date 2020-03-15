@@ -1,0 +1,11 @@
+---
+title: 'DATA 605 - Homework #7'
+author: "Zach Alexander"
+date: "3/14/2020"
+output: html_document
+---
+
+***
+
+> **Question #1**: Let $X_{1}$, $X_{2}$, ..., $X_{n}$ be $n$ mutually independent random variables, each of which is uniformly distributed on the integers from 1 to $k$. Let $Y$ denote the minimum of the $X_{i}$s. Find the distribution of $Y$.
+

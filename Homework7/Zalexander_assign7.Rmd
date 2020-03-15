@@ -1,0 +1,188 @@
+---
+title: 'DATA 605 - Homework #7'
+author: "Zach Alexander"
+date: "3/14/2020"
+output: html_document
+---
+
+***
+
+> **Question #1**: Let $X_{1}$, $X_{2}$, ..., $X_{n}$ be $n$ mutually independent random variables, each of which is uniformly distributed on the integers from 1 to $k$. Let $Y$ denote the minimum of the $X_{i}$s. Find the distribution of $Y$.
+
+Utilizing our combination formulas from last week, we know that the number of combinations of $X_{i}$s is $k^{n}$, where $k$ is the number of options and $n$ is the number of values. 
+
+First, we need to figure out the number of combinations that have at least one 1. This is essentially equal to the number of total combinations, $k^{n}$, minus all of the combinations with values between 2 and $k$, or $(k-1)^{n}$. Since this is the case, we know that:  
+
+$P(Y=1) = \frac{(k^{n}) - (k-1)^{n}}{k^{n}}$  
+
+Next, we need to figure out the number of combinations that have at least one 2, but do not have a 1. Given our equation above, we know that $P(Y=1) = \frac{(k^{n}) - (k-1)^{n}}{k^{n}}$, and therefore we can subtract this from the combinations with values between 3 and $k$, or $(k-2)^{n}$. When written out in a formula below, it is:  
+
+$P(Y=2) = \frac{k^{n}-(k-2)^{n} - [k^{n} - (k-1)^{n}]}{k^{n}}$  
+
+$P(Y=2) = \frac{k^{n}-(k-2)^{n} - k^{n} + (k-1)^{n}}{k^{n}}$  
+
+$P(Y=2) = \frac{-(k-2)^{n} + (k-1)^{n}}{k^{n}}$  
+
+$P(Y=2) = \frac{(k-1)^{n} - (k-2)^{n}}{k^{n}}$  
+
+
+If we were to continue this process to figure out the combinations that have at least one 3, but do not have a 1 or a 2, we would do:  
+
+$P(Y=3) = \frac{k^{n} - (k-3)^{n} - [(k-1)^{n}-(k-2)^{n}] - [k^{n} - (k-1)^{n}]}{k^{n}}$  
+
+$P(Y=3) = \frac{k^{n} - (k-3)^{n} - (k-1)^{n} + (k-2)^{n} - k^{n} + (k-1)^{n}}{k^{n}}$ 
+
+$P(Y=3) = \frac{ -(k-3)^{n} + (k-2)^{n}}{k^{n}}$  
+
+$P(Y=3) = \frac{(k-2)^{n}-(k-3)^{n}}{k^{n}}$  
+
+
+**ANSWER: As we can see here, we are developing a pattern where we map the distribution of Y as:**    
+
+$P(Y=j) = \frac{(k-j + 1)^{n}-(k-j)^{n}}{k^{n}}$  
+
+**where $j$ is the minimum value.**  
+
+***
+
+> **Question #2**: Your organization owns a copier (future lawyers, etc.) or MRI (future doctors). This machine has manufacturer's expected lifetime of 10 years. This means that we expect one failure every ten years. (Include the probability statements and R Code for each).
+
+> a) What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as a geometric. (Hint: the probability is equivalent to not failing during the first 8 years.)
+
+To model this as geometric, we can utilize the formula below:  
+
+$P(T=n) = q^{n-1}p$,  
+
+where for this question, the probability of the machine failing over a ten-year period is $p = 0.10$ and $q = 0.90$.  
+
+Now, to determine the probability that the machine will fail after 8 years, we will need to do the following:  
+
+Since $P(X > 8) = 1 - P(X \le 8)$, or the probability of the machine not failing during the first 8 years, we can know $P(X \le k) = 1 - (1 - q^{k + 1})$, which simplifies to $P(X \le k) = q^{k + 1}$.  
+
+Therefore, since $k$ is equal to the number of trials (years in this instance) before a "success" (machine failure) occurs, which is 8, we can solve the equation.  
+
+$P(X \le k) = 0.90^{8 + 1} = 0.90^{9} = 0.3874$  
+
+To find the expected value, we know the equation:  
+
+$E(X) = \frac{q}{p} = \frac{0.90}{0.10} = 9$, indicating that the expected value that the machine will fail is 9 years.  
+
+Additionally, we can find the standard deviation by utilizing the following information:  
+
+$\sigma^{2} = \sqrt{(\frac{0.90}{0.10})^{2}} = 9.4868$  
+
+
+**ANSWER: To summarize, when modeled as geometric, the the probability that the machine will fail after 8 years is approximately 0.3874, the expected value is 9 years, and the standard deviation 9.4868.**  
+
+To check this in R, we can utilize the following function `pgeom()`:  
+
+```{r}
+p <- 0.10
+q <- 0.90
+
+pgeom(8, p, lower.tail = FALSE)
+```
+
+***
+
+> b) What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as an exponential.
+
+Similar to part a, we know that $p = 0.10$ and $q = 0.90$. For exponential models, we can also state that $\lambda = 0.10$, which is the rate of failure of the machine. Given this information, and the exponential function:  
+
+$P(X \le k) = 1 - e^{\frac{-k}{\mu}}$, where $\mu = \frac{1}{\lambda}$.  
+
+Therefore, we can model this exponentially as:  
+
+$P(X > 8) = 1 - P(X \le 8) = 1 - (1 - e^{\frac{-8}{\frac{1}{0.10}}})$.
+
+```{r}
+1 - (1 - exp(-((8)/(1/0.1))))
+```
+
+The expected value is:
+
+$E(X)= \frac{1}{\lambda} = \frac{1}{0.10} = 10$  
+
+The standard deviation is:
+
+$\sigma^{2} = \sqrt{(\frac{1}{\lambda}})^{2} = \sqrt{(\frac{1}{0.10}})^{2} = 10$  
+
+**ANSWER: To summarize, when modeled as exponential, the the probability that the machine will fail after 8 years is approximately 0.4493, the expected value is 10 years, and the standard deviation is 10.**  
+
+To check this in R, we can utilize the following function `pexp()`:  
+
+```{r}
+pexp(8, 0.1, lower.tail = FALSE)
+```
+
+
+***
+
+> c) What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as a binomial. (Hint: 0 success in 8 years)
+
+
+To model this as a binomial, we can utilize the following equation:  
+
+$P(X=k) = {n \choose k} p^{k}q^{n-k}$, where we know that $p = 0.10$, $q = 0.90$, $n = 8$, since this is the number of trials (years), with $k = 0$ as the number of successes. Therefore, we can plug these values into our equation and solve.
+
+$P(X=0) = {8 \choose 0} (0.10)^{0}(0.90)^{8-0} = 0.4305$,
+
+```{r}
+choose(8, 0) * (0.10)^0 * (0.90)^8
+```
+
+The expected value can be calculated as:
+
+$E(X) = np = 8 \times (0.10) = 0.80$  
+
+The standard deviation can be calculated as:  
+
+$\sigma^{2} = \sqrt{npq} = \sqrt{(8)\times(0.10)\times(0.90)} = 0.8485$
+
+```{r}
+sqrt(8*0.10*0.90)
+```
+
+**ANSWER: To summarize, when modeled as binomial, the the probability that the machine will fail after 8 years is approximately 0.4305, the expected value is 0.8, and the standard deviation is 0.8485.**  
+
+To check this in R, we can utilize the following function `pbinom()`:  
+
+```{r}
+pbinom(0.9, 8, 0.10)
+```
+
+> D) What is the probability that the machine will fail after 8 years? Provide also the expected value and standard deviation. Model as a Poisson.
+
+Finally, to model this as a Poisson, we can utilize the following equation:  
+
+$P(X=k) = \frac{\lambda^{k}}{k!}e^{-\lambda}$  
+
+Since we want to find the probability of 0 failures before 8 years, we can set up our equation with $\lambda = 0.10$, and $k = 0$ (the number of failures). Then, we can plug this into our formula and solve:  
+
+$P(X=0) = \frac{(0.10)^{0}}{0!}e^{-0.10}$  
+
+```{r}
+((0.10^0) / factorial(0)) * exp(-0.10)
+```
+But since this only gives the probability for one year, we need to make this calculation 8 times and multiple the probabilities together for all 8 years: 
+
+$P(X=0)^8 = (\frac{(0.10)^{0}}{0!}e^{-0.10})^8 = 0.4493$  
+
+```{r}
+(((0.10^0) / factorial(0)) * exp(-0.10))^8
+```
+
+The expected value and the standard deviation are both equal to $\lambda$, which is 0.10:
+
+$E(X) = \lambda = 0.10$  
+
+$\sigma^{2} = \lambda = 0.10$
+
+**ANSWER: To summarize, when modeled as a Poisson, the the probability that the machine will fail after 8 years is approximately 0.4493, the expected value is 0.10, and the standard deviation is 0.10.**  
+
+To check this in R, we can utilize the following function `ppois()`:  
+
+```{r}
+ppois(0.90, 0.10)^8
+```
+
