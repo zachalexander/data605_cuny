@@ -1,0 +1,147 @@
+---
+title: 'DATA 605 - Homework #10'
+author: "Zach Alexander"
+date: "4/4/2020"
+output: html_document
+---
+
+***
+
+> **Question**: Smith is in jail and has 1 dollar; he can get out on bail if he has 8 dollars. A guard agrees to make a series of bets with him. If Smith bets A dollars, he wins A dollars with probability .4 and loses A dollars with probability .6.
+
+> Find the probability that he wins 8 dollars before losing all of his money if:
+(a) he bets 1 dollar each time (timid strategy).
+
+In order to solve for this problem, we can utilize the Gambler's Ruin equation from out textbook: 
+
+$P = \frac{1 - (\frac{q}{p})^{s}}{1 - (\frac{q}{p})^{M}}$  
+
+where $M = 8$, $s = 1$, $p = 0.4$, and $q = 0.6$, since the probability of Smith winning A dollars is 0.4, losing A dollars is 0.6, Smith starts with a stake of 1 (1 dollar), and it'll be played until Smith reaches a capital of 8.  
+
+With this in mind, we can solve the probability:  
+
+$P = \frac{1 - (\frac{0.6}{0.4})^{1}}{1 - (\frac{0.6}{0.4})^{8}}$  
+
+```{r}
+prob <- (1 - (0.6/0.4)^1) / (1 - (0.6/0.4)^8)
+prob
+```
+
+**ANSWER: The probability that Smith wins 8 dollars before losing all of his money if he bets 1 dollar each time (and applies a timid strategy) is about 0.0203.**  
+
+We can also solve this problem using matrices and Markov chains. First, we can set up our transition matrix  
+
+```{r}
+P <- matrix(c(0,1,0,0,0,0,0,0,0,
+              0.6,0,0.4,0,0,0,0,0,0,
+              0,0.6,0,0.4,0,0,0,0,0,
+              0,0,0.6,0,0.4,0,0,0,0,
+              0,0,0,0.6,0,0.4,0,0,0,
+              0,0,0,0,0.6,0,0.4,0,0,
+              0,0,0,0,0,0.6,0,0.4,0,
+              0,0,0,0,0,0,0.6,0,0.4,
+              0,0,0,0,0,0,0,0,1), nrow=9, byrow=TRUE)
+rownames(P) <- c("0","1","2","3","4","5","6","7","8")
+colnames(P) <- c("0","1","2","3","4","5","6","7","8")
+P
+
+# Matrix with just transient states
+Q <- P[2:8, c(2:8)]
+Q
+# Matrix with just absorbing states
+R <- P[2:8, c(1,9)]
+R
+```
+
+Now, with the matrices separated into transient and absorbing states, we can use matrix decomposition to break down the matrix with transient states ($N = (I - Q)^{-1}$): 
+```{r}
+# Fundamental matrix
+I <- diag(7)
+N <- solve(I-Q)
+N
+
+```
+
+Finally, we can find our absorption probabilities:
+```{r}
+# Absorption probablities
+X <- N %*% R
+X
+```
+
+As we can see, if we just isolate $s = 1$, we get:  
+
+```{r}
+paste0('The probability starting with a stake of 1 is ', round(X["1","8"], 4), '.')
+```
+***
+
+> (b) he bets, each time, as much as possible but not more than necessary to bring his fortune up to 8 dollars (bold strategy).
+
+Now, if Smith takes a bolder approach in his betting strategy, the transition matrix will look like:  
+
+\begin{equation}
+  P = 
+  \begin{bmatrix}
+  1 & 0 & 0 & 0 & 0\\ 
+  0.6 & 0 & 0.4 & 0 & 0\\ 
+  0.6 & 0 & 0 & 0.4 & 0\\ 
+  0.6 & 0 & 0 & 0 & 0.4\\ 
+  0 & 0 & 0 & 0 & 1\\ 
+  \end{bmatrix}
+\end{equation}
+
+With the columns of the matrix indicating transitions between 0, 1, 2, 4, and 8 dollars:  
+```{r}
+P2 <- matrix(c(1,0,0,0,0,
+               0.6,0,0.4,0,0,
+               0.6,0,0,0.4,0,
+               0.6,0,0,0,0.4,
+               0,0,0,0,1), ncol=5,nrow=5, byrow = TRUE)
+rownames(P2) <- c("1","2","3","4","5")
+colnames(P2) <- c("0","1","2","4","8")
+P2
+```
+
+Since our initial state, matching our transition matrix above, will start with 1 dollar:
+
+\begin{equation}
+  initial = 
+  \begin{bmatrix}
+  0 & 1 & 0 & 0 & 0\\ 
+  \end{bmatrix}
+\end{equation}  
+
+
+```{r}
+initial <- matrix(c(0, 1, 0, 0, 0), ncol=5,nrow = 1,byrow = TRUE)
+```
+
+With the transition matrix set, and the inital state ready as well, we can apply this to our Markov chain:  
+
+```{r}
+p1 <- initial %*% P2
+p1
+```
+```{r}
+p2 <- p1 %*% P2
+p2
+```
+
+```{r}
+p3 <- p2 %*% P2
+p3
+```
+
+```{r}
+p4 <- p3 %*% P2
+p4
+```
+
+**ANSWER: We can see that if Smith takes a bolder approach and bets each time, as much as possible but not more than necessary to bring his fortune up to 8 dollars, he'll have about a 0.064 probability of getting out on bail.**  
+
+***
+
+> (c) Which strategy gives Smith the better chance of getting out of jail?
+
+**ANSWER: As we can see from the calculation of our probabilites in parts a and b, it would be wiser for Smith to take the bolder approach in order to have a better chance of getting out on bail and obtaining the 8 dollars from betting.**  
