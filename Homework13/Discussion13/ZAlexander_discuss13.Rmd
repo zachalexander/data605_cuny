@@ -1,0 +1,279 @@
+---
+title: 'DATA 605 - Discussion #13'
+author: "Zach Alexander"
+date: "4/22/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require('dplyr')
+require('tidyverse')
+require('tidycensus')
+require('ggplot2')
+require('knitr')
+require('kableExtra')
+require('outliers')
+```
+
+***
+
+### Multiple Regression Analysis of COVID-19 Data by U.S. County
+
+***
+
+Continuing 
+
+For the discussion questions over the next two weeks, I thought I'd build a regression model with county-level COVID-19 data and U.S. Census estimates. Because confirmed case counts are highly dependent on access to testing, access to hospitals (most confirmed case counts come directly from hospital administrators), and other factors, this model will likely reflect rough estimates of predicted counts, but I thought it was timely and useful to practice with this type of information.  
+
+For this first week, I'll build a simple one-factor regression model using population estimates and the number of confirmed COVID-19 cases by U.S. County as of April 14th, 2020 (yesterday).
+
+***
+
+##### Step 1: Downloading the Data
+
+***
+
+I decided to utilize the New York Times dataset that was made open-source at the end of March. For more information about the methodology of these confirmed case counts, you can find a [detailed explanation here](https://github.com/nytimes/covid-19-data).  
+
+Additionally, I'll be using U.S. Census data estimates as factors for my regression model. This week, I decided to utilize population estimates as my factor for my regression. I found a large dataset on the [Census website](https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html#par_textimage_70769902) with population estimates as recent as 2019.  
+
+I saved both of these files to my github account and read them into R:  
+
+```{r cars}
+county_covid <- read.csv('https://raw.githubusercontent.com/zachalexander/data605_cuny/master/Homework12/Discussion12/covid-19_county.csv', header = TRUE)
+
+county_population <- read.csv('https://raw.githubusercontent.com/zachalexander/data605_cuny/master/Homework12/Discussion12/county_population.csv', header = TRUE)
+
+education_data <- read.csv('https://raw.githubusercontent.com/zachalexander/data_606_cunysps/master/Final_Project/education_data_fip.csv', header = TRUE)
+```
+
+***
+
+##### Step 2: Tidying the Data
+
+***
+
+With the data successfully loaded into R, I then had to do a bit of tidying to ensure that my county-level data was accurate and reflected the most up-to-date COVID-19 confirmed case counts.  
+
+First, I decided to tidy my COVID-19 data. Since the confirmed counts are cumulative and broken out by each day since late January, I needed to filter the dataset to only include the confirmed counts for April 14th, 2020.
+
+```{r}
+covid_sum <- county_covid %>% 
+  group_by(fips, county, state) %>% 
+  filter(date == '2020-04-14')
+```
+
+Next, I noticed that the New York Times groups the confirmed counts for New York City into one row, instead of breaking it into the five counties that comprise of "New York City" (Queens, Kings, New York, Bronx and Richmond). Therefore, I decided to use the FIPS code associated with New York County (36061) as my identifier when I eventually merge the population data into the confirmed case data. I then adjusted the population estimate to reflect the population of all five counties instead of just New York County (seen later).  
+
+```{r}
+covid_sum <- within(covid_sum, {
+    f <- county == 'New York City'
+    fips[f] <- '36061'
+}) 
+```
+
+For the merge, I also thought it would be helpful to make the county names consistent across both datasets.
+```{r}
+covid_sum$county <- paste(covid_sum$county, 'County')
+```
+
+With the COVID-19 data file ready for the merge, I then turned my attention to my population data file. In order to use county FIPS codes as my identifier in both datasets, I had to generate the FIPS codes in the population file.
+```{r}
+county_population <- county_population %>% 
+  select(STATE, COUNTY, STNAME, CTYNAME, POPESTIMATE2019)
+
+county_population$fips <- NA
+for (i in 1:length(county_population$STATE)) {
+  if(county_population$COUNTY[i] < 10) {
+    county_population$fips[i] <- paste0(county_population$STATE[i], '00', county_population$COUNTY[i])
+  }
+  if(county_population$COUNTY[i] < 100 & county_population$COUNTY[i] >= 10) {
+    county_population$fips[i] <- paste0(county_population$STATE[i], '0', county_population$COUNTY[i])
+  }
+  if(county_population$COUNTY[i] >=100) {
+    county_population$fips[i] <- paste0(county_population$STATE[i], county_population$COUNTY[i])
+  }
+}
+
+county_population <- county_population %>% 
+  select(fips, CTYNAME, STNAME, POPESTIMATE2019)
+names(county_population) <- c('fips', 'county', 'state', 'pop_estimate')
+```
+
+I also noticed that this file had overall state population estimates, so before merging, I made sure to filter these out.
+```{r}
+county_population <- county_population %>% 
+  filter(grepl("County",county))
+```
+
+With both data files ready to go, I then merged the population estimates data into the COVID-19 data file and created one final dataframe. I also updated the population count for New York City to ensure that it didn't just account for the population in New York County, but also the four other counties in the metropolitan area.
+```{r}
+fnl <- merge(covid_sum, county_population, by='fips')
+
+fnl <- fnl %>% 
+  select(fips, county.x, state.x, cases, pop_estimate)
+
+names(fnl) <- c('fips', 'county', 'state', 'case_count', 'pop_estimate')
+
+fnl$pop_estimate[fnl$county == 'New York City County'] <- 8398748
+fnl$county[fnl$county == 'New York City County'] <- 'New York City'
+
+fnl <- fnl %>% 
+  arrange(desc(case_count))
+```
+
+Here is a look at my final dataframe, ready to start my regression analysis:  
+
+```{r}
+kable(head(fnl, n=15L)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+***
+
+##### Initial Analysis
+
+***
+
+First, it's always good to take an initial look at the dataset. We can identify the dimensions:
+
+```{r}
+dim(fnl)
+```
+
+Our dataframe consists of 2563 counties, which is about 85% of all counties in the United States (3,009 total counties in the US).  
+
+Next, we can take some summary statistics of the number of confirmed cases for COVID-19 by county:
+```{r}
+summary(fnl$case_count)
+```
+
+We can see that, on average, there are about 224 confirmed cases by county, but the mean appears to be skewed since the median value is only 12 confirmed cases and 75% of counties have confirmed case counts by that fall below 50. As we've been hearing on the news, hotspots seem to develop, which is supported by these summary statistics. Additionally, New York City has been hosting the brunt of these confirmed cases, shown in the maximum above (110,465 confirmed cases as of April 14th, 2020). Therefore, the spread of confirmed case counts is quite large.  
+
+This can also be seen when we plot a histogram of confirmed case counts by county:  
+
+```{r, echo=FALSE}
+p<-ggplot(fnl, aes(x=case_count)) + 
+  geom_histogram(color="#333333", fill="darkred", bins = 30)
+p <- p + ggtitle("Histogram of Confirmed Cases of COVID-19 by County") +
+  xlab("Confirmed Counts") + ylab("Frequency")
+p
+```
+
+We'll do the same for the population estimates by county. Here's the summary:
+```{r}
+summary(fnl$pop_estimate)
+```
+
+For the population estimates, on average, there are about 123,000 people in each county, but the mean appears to be skewed since the median value is only at roughly 33,500 people in each county, and 75% of counties have population estimates below 85,000 people. As expected, many people cluster in cities, but a majority of counties tend to be more rural and suburban, with fewer people.  
+
+This can also be seen when we plot a histogram of population estimates by county: 
+
+```{r, echo=FALSE}
+p_pop<-ggplot(fnl, aes(x=pop_estimate)) + 
+  geom_histogram(color="#333333", fill="darkred", bins = 30)
+p_pop <- p_pop + ggtitle("Histogram of 2019 Population Estimates by County") +
+  xlab("Population Estimate") + ylab("Frequency")
+p_pop
+```
+
+With this in mind, we may run into some issues building a reliable linear regression model if both our predictor and response variable(s) are heavily right skewed. I decided to attempt a log transformation of the population estimates and confirmed case counts to see if this will help my regression diagnostics later.
+
+```{r, echo=FALSE}
+fnl$log_cases <- log(fnl$case_count)
+fnl$log_pop <- log(fnl$pop_estimate)
+
+p<-ggplot(fnl, aes(x=log_cases)) + 
+  geom_histogram(color="#333333", fill="darkred", bins = 30)
+p <- p + ggtitle("Histogram of Confirmed Cases of COVID-19 by County (Log Transformed)") +
+  xlab("Confirmed Counts") + ylab("Frequency")
+p
+
+```
+
+```{r, echo=FALSE}
+p<-ggplot(fnl, aes(x=log_pop)) + 
+  geom_histogram(color="#333333", fill="darkred", bins = 30)
+p <- p + ggtitle("Histogram of 2019 Population Estimates by County (Log Transformed)") +
+  xlab("Population Estimate") + ylab("Frequency")
+p
+```
+
+As we can see, after conducting log transformations on both variables, we do start to see more normal distributions. We'll use these factors as we start to build our one-factor linear regression.  
+
+***
+
+##### Building the One-Factor Linear Regression
+
+***
+
+With our factors ready to go, we can create a linear regression model.
+
+```{r}
+covid_lm <- lm(fnl$log_pop ~ fnl$log_cases)
+covid_lm
+```
+
+Above, we can see the intercept and slope of our linear regression (8.962 and 0.5914 respectively). To get a more detailed outlook of the performance of our model, we can use the `summary()` function in R:  
+
+```{r}
+summary(covid_lm)
+```
+
+***
+
+##### Evaluating the Model and Residual Analysis
+
+***
+
+After running the summary above, we can see a few things:
+
++ The median residual value is around zero, which is a good sign.  
+
++ Additionally, the minimum and maximum values of the residuals are roughly around the same magnitude (3 and 2 respectively)  
+
++ The standard error appears to be at least five times smaller than the corresponding coefficient (0.5914 / 0.00756 = 78.2275)  
+
++ Our Multiple R-squared value is 0.705, which indicates that population size by county accounts for about 70.5% of the variability in the number of confirmed COVID-19 cases by county. This is a pretty good start for our regression model, especially with one factor.  
+
+Here's a plot of our model, with the line shown in black:  
+```{r, echo=FALSE}
+ggplot(fnl, aes(x=log_pop, y=log_cases)) +
+  geom_point(size=2, color="#333333", fill="darkred", alpha=0.5) +
+  xlab("Confirmed Cases (Log transformed)") + 
+  ylab("Population Estimate (Log Transformed)") +
+  geom_smooth(method=lm, color="#333333")
+```
+
+From above, we can see a pretty well-fit line, and when plotting residuals (below), we can confirm that most seem to be uniformly scattered above and below zero:  
+```{r}
+plot(fitted(covid_lm),resid(covid_lm))
+```
+
+This can also be visualized in a basic histogram, or a quantile-versus-quantile (Q-Q) plot (see below):  
+
+```{r}
+p<-ggplot(fnl, aes(x=resid(covid_lm))) + 
+  geom_histogram(color="#333333", fill="#dddddd", bins = 30)
+p<- p + ggtitle("Histogram of Model Residuals") +
+  xlab("Residual") + ylab("Frequency")
+p
+
+qqnorm(resid(covid_lm))
+qqline(resid(covid_lm))
+```
+
+***
+
+##### Was the Linear Model Appropriate?
+
+***
+
+From this residual analysis, we can conclude that using population estimates to predict the number of confirmed COVID-19 cases is a pretty good start, and works as a decent predictor without adding other factors. However, it'll be interesting when I expand this work next week and add more factors to my regression model. I think at this point, without additional factors, we can say that this linear model is appropriate -- however, next week I may have a different conclusion!
+
+
+
+
