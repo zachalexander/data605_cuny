@@ -234,5 +234,20 @@ In the end, the residual analysis shows that the model doesn't meet many of the 
 
 > 5. Forecast LifeExp when PropMD=.03 and TotExp = 14. Does this forecast seem realistic? Why or why not?  
 
+Using the equation we generated from our linear model, we can forecast the following: 
 
++ $LifeExp = 62.277 + (1497 \times PropMD) + (0.00007233 \times TotExp) + (-0.006026 \times PropMD:TotExp)$  
+
+With values for PropMD and TotExp, we can calculate and forecast:  
+
+
++ $LifeExp = 62.277 + (1497 \times 0.03) + (0.00007233 \times 14) + (-0.006026 \times (0.03 \times 14))$  
+
++ $LifeExp = 107.185$ years  
+
+```{r, echo=FALSE}
+y_3 = 62.277 + (1497 * 0.03) + (0.00007233 * 14) + (-0.006026 * (0.03 * 14))
+```
+
+**The average life expectancy when `PropMD` is equal to 0.03 and `TotExp` is equal to 14 is about 107.19 years. This is not a realistic forecast. Given the average life expectancy for humans is much lower, in the year 2008 when this data was released it was about 68 years, an estimation of an average life expectancy for a country of 107 is very unreasonable.**
 
