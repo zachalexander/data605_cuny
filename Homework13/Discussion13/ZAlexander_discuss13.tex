@@ -1,0 +1,848 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={DATA 605 - Discussion \#13},
+  pdfauthor={Zach Alexander},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+
+\title{DATA 605 - Discussion \#13}
+\author{Zach Alexander}
+\date{4/22/2020}
+
+\begin{document}
+\maketitle
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{multiple-regression-analysis-of-covid-19-data-by-u.s.-county}{%
+\subsubsection{Multiple Regression Analysis of COVID-19 Data by U.S.
+County}\label{multiple-regression-analysis-of-covid-19-data-by-u.s.-county}}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+Continuing my regression analysis from last week, this time around, I'll
+add in additional terms, including a quadratic term, dichotomous term,
+and a quadratic vs.~dichotomous interaction term to build out a multiple
+regression.
+
+From last week's analysis, it appears that population estimates were a
+fairly good predictor of the number of confirmed cases of COVID-19 at a
+county level. To make this more of a predictive model, we'll determine
+whether population estimates, as well as other variables can accurately
+predict the number of new confirmed cases for yesterday, April 21st,
+based on counts from previous days. If the model fits the data well, we
+could eventually see if we can apply this to future dates.
+
+To do this, we'll first have to merge in some extra data. Fortunately, I
+have tidy'd other census data in past semesters and can read in the data
+file below that includes demographic, gender, age, education, income,
+and employment data on a county level.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{step-1-downloading-the-data}{%
+\subparagraph{Step 1: Downloading the
+Data}\label{step-1-downloading-the-data}}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+I decided to utilize the New York Times dataset that was made
+open-source at the end of March. For more information about the
+methodology of these confirmed case counts, you can find a
+\href{https://github.com/nytimes/covid-19-data}{detailed explanation
+here}.
+
+Additionally, I'll be using U.S. Census data estimates as factors for my
+regression model. This week, I decided to utilize population estimates
+as my factor for my regression. I found a large dataset on the
+\href{https://www.census.gov/data/datasets/time-series/demo/popest/2010s-counties-total.html\#par_textimage_70769902}{Census
+website} with population estimates as recent as 2019.
+
+And finally, as mentioned above, I downloaded the census data I compiled
+from last semester as an additional file for this week.
+
+I saved all three of these files to my github account and read them into
+R:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{county_covid <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'https://raw.githubusercontent.com/zachalexander/data605_cuny/master/Homework13/Discussion13/us-counties_covid19_4222020.csv'}\NormalTok{, }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{)}
+
+\NormalTok{county_population <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'https://raw.githubusercontent.com/zachalexander/data605_cuny/master/Homework12/Discussion12/county_population.csv'}\NormalTok{, }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{)}
+
+\NormalTok{education_data <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{'https://raw.githubusercontent.com/zachalexander/data_606_cunysps/master/Final_Project/education_data_fip.csv'}\NormalTok{, }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{step-2-tidying-the-data}{%
+\subparagraph{Step 2: Tidying the Data}\label{step-2-tidying-the-data}}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+With the data successfully loaded into R, I then had to do a bit of
+tidying to ensure that my county-level data was accurate and reflected
+the most up-to-date COVID-19 confirmed case counts.
+
+First, I decided to tidy my COVID-19 data. Since the confirmed counts
+are cumulative and broken out by each day since late January, I needed
+to filter the dataset to only include the confirmed counts for April
+14th, 2020.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid_week <-}\StringTok{ }\NormalTok{county_covid }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(fips, date) }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{((}\KeywordTok{as.Date}\NormalTok{(date) }\OperatorTok{>=}\StringTok{ }\KeywordTok{as.Date}\NormalTok{(}\StringTok{'2020-04-12'}\NormalTok{)) }\OperatorTok{&}\StringTok{ }\NormalTok{(}\KeywordTok{as.Date}\NormalTok{(date) }\OperatorTok{<=}\StringTok{ }\KeywordTok{as.Date}\NormalTok{(}\StringTok{'2020-04-21'}\NormalTok{)))}
+
+\NormalTok{covid_test <-}\StringTok{ }\NormalTok{covid_week }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{((}\KeywordTok{as.Date}\NormalTok{(date) }\OperatorTok{==}\StringTok{ }\KeywordTok{as.Date}\NormalTok{(}\StringTok{'2020-04-21'}\NormalTok{)))}
+
+\NormalTok{covid_week_pivot <-}\StringTok{ }\NormalTok{covid_week }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{pivot_wider}\NormalTok{(}\DataTypeTok{id_cols =} \KeywordTok{c}\NormalTok{(date, fips, state, county), }\DataTypeTok{names_from =}\NormalTok{ date, }\DataTypeTok{values_from =}\NormalTok{ cases)}
+
+\NormalTok{diff_list <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"413_diff"}\NormalTok{, }\StringTok{"414_diff"}\NormalTok{, }\StringTok{"415_diff"}\NormalTok{, }\StringTok{"416_diff"}\NormalTok{, }\StringTok{"417_diff"}\NormalTok{, }\StringTok{"418_diff"}\NormalTok{, }\StringTok{"419_diff"}\NormalTok{, }\StringTok{"420_diff"}\NormalTok{)}
+\NormalTok{covid_week_pivot <-}\StringTok{ }\KeywordTok{cbind}\NormalTok{(covid_week_pivot, }\KeywordTok{setNames}\NormalTok{( }\KeywordTok{lapply}\NormalTok{(diff_list, }
+                                         \ControlFlowTok{function}\NormalTok{(x) }\DataTypeTok{x=}\OtherTok{NA}\NormalTok{), diff_list) )}
+
+\ControlFlowTok{for}\NormalTok{(i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(covid_week_pivot}\OperatorTok{$}\NormalTok{fips))\{}
+  \ControlFlowTok{for}\NormalTok{(j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\DecValTok{8}\NormalTok{)\{}
+\NormalTok{  covid_week_pivot[i,(j}\OperatorTok{+}\DecValTok{12}\NormalTok{)] <-}\StringTok{ }\NormalTok{covid_week_pivot[i, (j}\OperatorTok{+}\DecValTok{4}\NormalTok{)] }\OperatorTok{-}\StringTok{ }\NormalTok{covid_week_pivot[i, (j}\OperatorTok{+}\DecValTok{3}\NormalTok{)]}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\NormalTok{covid_week_fnl <-}\StringTok{ }\NormalTok{covid_week_pivot }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(fips, state, county, }\StringTok{`}\DataTypeTok{413_diff}\StringTok{`}\NormalTok{, }\StringTok{`}\DataTypeTok{414_diff}\StringTok{`}\NormalTok{, }\StringTok{`}\DataTypeTok{415_diff}\StringTok{`}\NormalTok{, }\StringTok{`}\DataTypeTok{416_diff}\StringTok{`}\NormalTok{, }\StringTok{`}\DataTypeTok{417_diff}\StringTok{`}\NormalTok{, }\StringTok{`}\DataTypeTok{418_diff}\StringTok{`}\NormalTok{, }\StringTok{`}\DataTypeTok{419_diff}\StringTok{`}\NormalTok{, }\StringTok{`}\DataTypeTok{420_diff}\StringTok{`}\NormalTok{, }\StringTok{`}\DataTypeTok{2020-04-20}\StringTok{`}\NormalTok{)}
+
+
+\NormalTok{covid_week_fnl <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(covid_week_fnl, }\DataTypeTok{week_avg =} \KeywordTok{rowMeans}\NormalTok{(covid_week_fnl[, }\DecValTok{4}\OperatorTok{:}\DecValTok{11}\NormalTok{], }\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+Next, I noticed that the New York Times groups the confirmed counts for
+New York City into one row, instead of breaking it into the five
+counties that comprise of ``New York City'' (Queens, Kings, New York,
+Bronx and Richmond). Therefore, I decided to use the FIPS code
+associated with New York County (36061) as my identifier when I
+eventually merge the population data into the confirmed case data. I
+then adjusted the population estimate to reflect the population of all
+five counties instead of just New York County (seen later).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid_week_fnl <-}\StringTok{ }\KeywordTok{within}\NormalTok{(covid_week_fnl, \{}
+\NormalTok{    f <-}\StringTok{ }\NormalTok{county }\OperatorTok{==}\StringTok{ 'New York City'}
+\NormalTok{    fips[f] <-}\StringTok{ '36061'}
+\NormalTok{\}) }
+
+\NormalTok{covid_test <-}\StringTok{ }\KeywordTok{within}\NormalTok{(covid_test, \{}
+\NormalTok{    f <-}\StringTok{ }\NormalTok{county }\OperatorTok{==}\StringTok{ 'New York City'}
+\NormalTok{    fips[f] <-}\StringTok{ '36061'}
+\NormalTok{\}) }
+
+\NormalTok{covid_test <-}\StringTok{ }\NormalTok{covid_test }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(fips, state, county, cases)}
+\end{Highlighting}
+\end{Shaded}
+
+For the merge, I also thought it would be helpful to make the county
+names consistent across both datasets.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid_week_fnl}\OperatorTok{$}\NormalTok{county <-}\StringTok{ }\KeywordTok{paste}\NormalTok{(covid_week_fnl}\OperatorTok{$}\NormalTok{county, }\StringTok{'County'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+With the COVID-19 data file ready for the merge, I then turned my
+attention to my population data file. In order to use county FIPS codes
+as my identifier in both datasets, I had to generate the FIPS codes in
+the population file.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{county_population <-}\StringTok{ }\NormalTok{county_population }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(STATE, COUNTY, STNAME, CTYNAME, POPESTIMATE2019)}
+
+\NormalTok{county_population}\OperatorTok{$}\NormalTok{fips <-}\StringTok{ }\OtherTok{NA}
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(county_population}\OperatorTok{$}\NormalTok{STATE)) \{}
+  \ControlFlowTok{if}\NormalTok{(county_population}\OperatorTok{$}\NormalTok{COUNTY[i] }\OperatorTok{<}\StringTok{ }\DecValTok{10}\NormalTok{) \{}
+\NormalTok{    county_population}\OperatorTok{$}\NormalTok{fips[i] <-}\StringTok{ }\KeywordTok{paste0}\NormalTok{(county_population}\OperatorTok{$}\NormalTok{STATE[i], }\StringTok{'00'}\NormalTok{, county_population}\OperatorTok{$}\NormalTok{COUNTY[i])}
+\NormalTok{  \}}
+  \ControlFlowTok{if}\NormalTok{(county_population}\OperatorTok{$}\NormalTok{COUNTY[i] }\OperatorTok{<}\StringTok{ }\DecValTok{100} \OperatorTok{&}\StringTok{ }\NormalTok{county_population}\OperatorTok{$}\NormalTok{COUNTY[i] }\OperatorTok{>=}\StringTok{ }\DecValTok{10}\NormalTok{) \{}
+\NormalTok{    county_population}\OperatorTok{$}\NormalTok{fips[i] <-}\StringTok{ }\KeywordTok{paste0}\NormalTok{(county_population}\OperatorTok{$}\NormalTok{STATE[i], }\StringTok{'0'}\NormalTok{, county_population}\OperatorTok{$}\NormalTok{COUNTY[i])}
+\NormalTok{  \}}
+  \ControlFlowTok{if}\NormalTok{(county_population}\OperatorTok{$}\NormalTok{COUNTY[i] }\OperatorTok{>=}\DecValTok{100}\NormalTok{) \{}
+\NormalTok{    county_population}\OperatorTok{$}\NormalTok{fips[i] <-}\StringTok{ }\KeywordTok{paste0}\NormalTok{(county_population}\OperatorTok{$}\NormalTok{STATE[i], county_population}\OperatorTok{$}\NormalTok{COUNTY[i])}
+\NormalTok{  \}}
+\NormalTok{\}}
+
+\NormalTok{county_population <-}\StringTok{ }\NormalTok{county_population }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(fips, CTYNAME, STNAME, POPESTIMATE2019)}
+\KeywordTok{names}\NormalTok{(county_population) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'fips'}\NormalTok{, }\StringTok{'county'}\NormalTok{, }\StringTok{'state'}\NormalTok{, }\StringTok{'pop_estimate'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+I also noticed that this file had overall state population estimates, so
+before merging, I made sure to filter these out.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{county_population <-}\StringTok{ }\NormalTok{county_population }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{filter}\NormalTok{(}\KeywordTok{grepl}\NormalTok{(}\StringTok{"County"}\NormalTok{,county))}
+\end{Highlighting}
+\end{Shaded}
+
+With both data files ready to go, I then merged the population estimates
+data into the COVID-19 data file and created one final dataframe. I also
+updated the population count for New York City to ensure that it didn't
+just account for the population in New York County, but also the four
+other counties in the metropolitan area.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fnl <-}\StringTok{ }\KeywordTok{merge}\NormalTok{(covid_week_fnl, county_population, }\DataTypeTok{by=}\StringTok{'fips'}\NormalTok{)}
+
+\NormalTok{fnl <-}\StringTok{ }\NormalTok{fnl }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(fips, county.x, state.x, }\StringTok{`}\DataTypeTok{2020-04-20}\StringTok{`}\NormalTok{, week_avg, pop_estimate)}
+
+\KeywordTok{names}\NormalTok{(fnl) <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'fips'}\NormalTok{, }\StringTok{'county'}\NormalTok{, }\StringTok{'state'}\NormalTok{, }\StringTok{'April20cases'}\NormalTok{, }\StringTok{'week_avg'}\NormalTok{, }\StringTok{'pop_estimate'}\NormalTok{)}
+
+\NormalTok{fnl}\OperatorTok{$}\NormalTok{pop_estimate[fnl}\OperatorTok{$}\NormalTok{county }\OperatorTok{==}\StringTok{ 'New York City County'}\NormalTok{] <-}\StringTok{ }\DecValTok{8398748}
+\NormalTok{fnl}\OperatorTok{$}\NormalTok{county[fnl}\OperatorTok{$}\NormalTok{county }\OperatorTok{==}\StringTok{ 'New York City County'}\NormalTok{] <-}\StringTok{ 'New York City'}
+
+\NormalTok{fnl <-}\StringTok{ }\NormalTok{fnl }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{arrange}\NormalTok{(}\KeywordTok{desc}\NormalTok{(week_avg))}
+\end{Highlighting}
+\end{Shaded}
+
+Here is a look at my final dataframe, ready to start my regression
+analysis:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(fnl, }\DataTypeTok{n=}\NormalTok{15L)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{kable_styling}\NormalTok{(}\DataTypeTok{bootstrap_options =} \KeywordTok{c}\NormalTok{(}\StringTok{"striped"}\NormalTok{, }\StringTok{"hover"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l|l|l|r|r|r}
+\hline
+fips & county & state & April20cases & week\_avg & pop\_estimate\\
+\hline
+36061 & New York City & New York & 136816 & 4293.1429 & 8398748\\
+\hline
+17031 & Cook County & Illinois & 22101 & 946.7143 & 5150233\\
+\hline
+36059 & Nassau County & New York & 30677 & 902.7143 & 1356924\\
+\hline
+36103 & Suffolk County & New York & 27662 & 859.8571 & 1476601\\
+\hline
+36119 & Westchester County & New York & 24306 & 645.8571 & 967506\\
+\hline
+6037 & Los Angeles County & California & 13816 & 628.0000 & 10039107\\
+\hline
+34039 & Union County & New Jersey & 9972 & 476.5714 & 556341\\
+\hline
+34017 & Hudson County & New Jersey & 11150 & 467.2857 & 672391\\
+\hline
+25017 & Middlesex County & Massachusetts & 9253 & 467.1429 & 1611699\\
+\hline
+34013 & Essex County & New Jersey & 10729 & 442.1429 & 798975\\
+\hline
+34003 & Bergen County & New Jersey & 13011 & 417.0000 & 932202\\
+\hline
+42101 & Philadelphia County & Pennsylvania & 9553 & 391.8571 & 1584064\\
+\hline
+25025 & Suffolk County & Massachusetts & 8314 & 390.7143 & 803907\\
+\hline
+34031 & Passaic County & New Jersey & 8479 & 361.2857 & 501826\\
+\hline
+34023 & Middlesex County & New Jersey & 8346 & 337.0000 & 825062\\
+\hline
+\end{tabular}
+\end{table}
+
+We'll then merge in a few more terms from the other census dataset:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fnl <-}\StringTok{ }\KeywordTok{merge}\NormalTok{(fnl, education_data, }\DataTypeTok{by=}\StringTok{'fips'}\NormalTok{)}
+
+\NormalTok{fnl <-}\StringTok{ }\NormalTok{fnl }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(fips, county.x, state.x, April20cases, week_avg, pop_estimate, median_hh_inc, age65andolder_pct, nonwhite_pct, lesscollege_pct)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{))}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{April20cases)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{week_avg)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{pop_estimate)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{median_hh_inc)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{age65andolder_pct)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{nonwhite_pct)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{lesscollege_pct)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ZAlexander_discuss13_files/figure-latex/unnamed-chunk-9-1.pdf}
+
+\hypertarget{dichotomous-variable}{%
+\subparagraph{Dichotomous Variable}\label{dichotomous-variable}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{mean}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{median_hh_inc)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 48349.44
+\end{verbatim}
+
+It looks like we could create a dichotomous term from our median
+household income variable. By doing this, we'll create a new variable
+called \texttt{median\_hh\_inc\_dichot}, which will be a value of 1 if
+the median household income is greater than \$48,300 and 0 if the median
+household income is less than this value for each county:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{for}\NormalTok{ (i }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{fips)) \{}
+  \ControlFlowTok{if}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{median_hh_inc[i] }\OperatorTok{>}\StringTok{ }\DecValTok{43000}\NormalTok{)\{}
+\NormalTok{    fnl}\OperatorTok{$}\NormalTok{median_hh_inc_dichot[i] <-}\StringTok{ }\DecValTok{1}
+\NormalTok{  \} }\ControlFlowTok{else}\NormalTok{ \{}
+\NormalTok{    fnl}\OperatorTok{$}\NormalTok{median_hh_inc_dichot[i] <-}\StringTok{ }\DecValTok{0}
+\NormalTok{  \}}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+And here's the split between the two factors of this new dichotomous
+variable:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{table}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{median_hh_inc_dichot)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##    0    1 
+##  953 1690
+\end{verbatim}
+
+\hypertarget{quadratic-variable}{%
+\subparagraph{Quadratic Variable}\label{quadratic-variable}}
+
+It looks like from our initial plots of histograms above, we can
+transform our \texttt{nonwhite\_pct} variable by taking the square root,
+to make it more of a normal distribution. By doing this, we can now see
+that the distribution is approaching normal:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{))}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{April20cases)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{week_avg)}
+\KeywordTok{hist}\NormalTok{(}\DecValTok{1} \OperatorTok{/}\StringTok{ }\KeywordTok{log}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{pop_estimate))}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{median_hh_inc)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{age65andolder_pct)}
+\KeywordTok{hist}\NormalTok{(}\KeywordTok{sqrt}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{nonwhite_pct))}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{lesscollege_pct)}
+
+\NormalTok{fnl}\OperatorTok{$}\NormalTok{pop_estimate <-}\StringTok{ }\DecValTok{1} \OperatorTok{/}\StringTok{ }\KeywordTok{log}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{pop_estimate)}
+\NormalTok{fnl}\OperatorTok{$}\NormalTok{nonwhite_pct <-}\StringTok{ }\KeywordTok{sqrt}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{nonwhite_pct)}
+
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow=}\KeywordTok{c}\NormalTok{(}\DecValTok{3}\NormalTok{,}\DecValTok{3}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ZAlexander_discuss13_files/figure-latex/unnamed-chunk-13-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{April20cases)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{week_avg)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{pop_estimate)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{median_hh_inc)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{age65andolder_pct)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{nonwhite_pct)}
+\KeywordTok{hist}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{lesscollege_pct)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ZAlexander_discuss13_files/figure-latex/unnamed-chunk-13-2.pdf}
+
+Additionally, I did a log transformation on the population estimate term
+to make it more normalized as well.
+
+\hypertarget{quadratic-and-dichotomous-interaction-term}{%
+\subparagraph{Quadratic and Dichotomous Interaction
+Term}\label{quadratic-and-dichotomous-interaction-term}}
+
+When we run our linear regression model, we'll be sure to create an
+interaction term between our non-white percentage variable (quadratic
+transformation) and our dichotomous median household income variable.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{initial-analysis}{%
+\subparagraph{Initial Analysis}\label{initial-analysis}}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+With our variables and dataset ready to go, we will now take a quick
+look at interactions between variables. We can do this using the
+\texttt{pairs()} function:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fnl_pairs <-}\StringTok{ }\NormalTok{fnl }\OperatorTok{%>%}\StringTok{ }
+\StringTok{  }\KeywordTok{select}\NormalTok{(April20cases, week_avg, pop_estimate, median_hh_inc, median_hh_inc_dichot, age65andolder_pct,nonwhite_pct, lesscollege_pct)}
+\KeywordTok{pairs}\NormalTok{(fnl_pairs)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ZAlexander_discuss13_files/figure-latex/unnamed-chunk-14-1.pdf}
+
+If you look closely, we can see that there seems to be a somewhat strong
+interaction between median household income and counties with a larger
+percentage of their population with less than a college degree -- this
+make sense intuitively. Other interactions are not as obvious, so we'll
+see how this fairs in our regression model.
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{building-the-one-factor-linear-regression}{%
+\subparagraph{Building the One-Factor Linear
+Regression}\label{building-the-one-factor-linear-regression}}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+With our factors ready to go, we can create a multiple linear regression
+model.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid_lm <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(fnl}\OperatorTok{$}\NormalTok{April20cases }\OperatorTok{~}\StringTok{ }\NormalTok{fnl}\OperatorTok{$}\NormalTok{April20cases }\OperatorTok{+}\StringTok{ }\NormalTok{fnl}\OperatorTok{$}\NormalTok{week_avg }\OperatorTok{+}\StringTok{ }\NormalTok{fnl}\OperatorTok{$}\NormalTok{pop_estimate }\OperatorTok{+}\StringTok{ }\NormalTok{fnl}\OperatorTok{$}\NormalTok{median_hh_inc }\OperatorTok{+}\StringTok{ }\NormalTok{fnl}\OperatorTok{$}\NormalTok{median_hh_inc_dichot }\OperatorTok{+}\StringTok{ }\NormalTok{fnl}\OperatorTok{$}\NormalTok{age65andolder_pct }\OperatorTok{+}\StringTok{ }\NormalTok{fnl}\OperatorTok{$}\NormalTok{nonwhite_pct }\OperatorTok{+}\StringTok{ }\NormalTok{fnl}\OperatorTok{$}\NormalTok{lesscollege_pct }\OperatorTok{+}\StringTok{ }\NormalTok{fnl}\OperatorTok{$}\NormalTok{median_hh_inc_dichot}\OperatorTok{:}\NormalTok{fnl}\OperatorTok{$}\NormalTok{nonwhite_pct)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in model.matrix.default(mt, mf, contrasts): the response appeared on the
+## right-hand side and was dropped
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in model.matrix.default(mt, mf, contrasts): problem with term 1 in
+## model.matrix: no columns are assigned
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid_lm}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = fnl$April20cases ~ fnl$April20cases + fnl$week_avg + 
+##     fnl$pop_estimate + fnl$median_hh_inc + fnl$median_hh_inc_dichot + 
+##     fnl$age65andolder_pct + fnl$nonwhite_pct + fnl$lesscollege_pct + 
+##     fnl$median_hh_inc_dichot:fnl$nonwhite_pct)
+## 
+## Coefficients:
+##                               (Intercept)  
+##                                -2.861e+02  
+##                              fnl$week_avg  
+##                                 3.079e+01  
+##                          fnl$pop_estimate  
+##                                 3.396e+03  
+##                         fnl$median_hh_inc  
+##                                -3.765e-05  
+##                  fnl$median_hh_inc_dichot  
+##                                 7.391e+01  
+##                     fnl$age65andolder_pct  
+##                                 5.995e-01  
+##                          fnl$nonwhite_pct  
+##                                -3.333e+00  
+##                       fnl$lesscollege_pct  
+##                                -7.393e-01  
+## fnl$median_hh_inc_dichot:fnl$nonwhite_pct  
+##                                -2.538e+01
+\end{verbatim}
+
+Above, we can see the intercept and slope of our linear regression
+(8.962 and 0.5914 respectively). To get a more detailed outlook of the
+performance of our model, we can use the \texttt{summary()} function in
+R:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(covid_lm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = fnl$April20cases ~ fnl$April20cases + fnl$week_avg + 
+##     fnl$pop_estimate + fnl$median_hh_inc + fnl$median_hh_inc_dichot + 
+##     fnl$age65andolder_pct + fnl$nonwhite_pct + fnl$lesscollege_pct + 
+##     fnl$median_hh_inc_dichot:fnl$nonwhite_pct)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6797.7   -19.8    14.6    59.5  4860.8 
+## 
+## Coefficients:
+##                                             Estimate Std. Error t value
+## (Intercept)                               -2.861e+02  1.547e+02  -1.849
+## fnl$week_avg                               3.079e+01  8.542e-02 360.452
+## fnl$pop_estimate                           3.396e+03  8.295e+02   4.094
+## fnl$median_hh_inc                         -3.765e-05  1.120e-03  -0.034
+## fnl$median_hh_inc_dichot                   7.391e+01  4.244e+01   1.742
+## fnl$age65andolder_pct                      5.995e-01  2.277e+00   0.263
+## fnl$nonwhite_pct                          -3.333e+00  6.278e+00  -0.531
+## fnl$lesscollege_pct                       -7.393e-01  1.291e+00  -0.573
+## fnl$median_hh_inc_dichot:fnl$nonwhite_pct -2.538e+01  8.695e+00  -2.919
+##                                           Pr(>|t|)    
+## (Intercept)                                0.06457 .  
+## fnl$week_avg                               < 2e-16 ***
+## fnl$pop_estimate                          4.37e-05 ***
+## fnl$median_hh_inc                          0.97318    
+## fnl$median_hh_inc_dichot                   0.08170 .  
+## fnl$age65andolder_pct                      0.79234    
+## fnl$nonwhite_pct                           0.59548    
+## fnl$lesscollege_pct                        0.56700    
+## fnl$median_hh_inc_dichot:fnl$nonwhite_pct  0.00354 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 408.4 on 2615 degrees of freedom
+##   (19 observations deleted due to missingness)
+## Multiple R-squared:  0.9814, Adjusted R-squared:  0.9814 
+## F-statistic: 1.727e+04 on 8 and 2615 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\hypertarget{backward-elimination}{%
+\subparagraph{Backward Elimination}\label{backward-elimination}}
+
+It looks like our \texttt{age65andolder\_pct} variable has the highest
+p-value, and others, including \texttt{median\_hh\_inc} and
+\texttt{lesscollege\_pct} will likely be removed when we do backward
+elimination because they also exhibit pretty high p-values. We can
+double check this by running the stepwise process:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{covid_lm <-}\StringTok{ }\KeywordTok{step}\NormalTok{(covid_lm, }\DataTypeTok{direction =} \StringTok{'backward'}\NormalTok{, }\DataTypeTok{trace =} \OtherTok{FALSE}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in model.matrix.default(object, data = structure(list(`fnl$April20cases`
+## = c(430L, : the response appeared on the right-hand side and was dropped
+\end{verbatim}
+
+\begin{verbatim}
+## Warning in model.matrix.default(object, data = structure(list(`fnl$April20cases`
+## = c(430L, : problem with term 1 in model.matrix: no columns are assigned
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{summary}\NormalTok{(covid_lm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = fnl$April20cases ~ fnl$week_avg + fnl$pop_estimate + 
+##     fnl$median_hh_inc_dichot + fnl$nonwhite_pct + fnl$median_hh_inc_dichot:fnl$nonwhite_pct)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6800.5   -19.7    13.7    59.7  4850.7 
+## 
+## Coefficients:
+##                                             Estimate Std. Error t value
+## (Intercept)                               -324.54516   81.98072  -3.959
+## fnl$week_avg                                30.79764    0.08459 364.070
+## fnl$pop_estimate                          3271.69836  740.05432   4.421
+## fnl$median_hh_inc_dichot                    77.07769   41.10527   1.875
+## fnl$nonwhite_pct                            -3.77270    5.98143  -0.631
+## fnl$median_hh_inc_dichot:fnl$nonwhite_pct  -25.23837    8.63175  -2.924
+##                                           Pr(>|t|)    
+## (Intercept)                               7.73e-05 ***
+## fnl$week_avg                               < 2e-16 ***
+## fnl$pop_estimate                          1.02e-05 ***
+## fnl$median_hh_inc_dichot                   0.06089 .  
+## fnl$nonwhite_pct                           0.52827    
+## fnl$median_hh_inc_dichot:fnl$nonwhite_pct  0.00349 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 408.2 on 2618 degrees of freedom
+##   (19 observations deleted due to missingness)
+## Multiple R-squared:  0.9814, Adjusted R-squared:  0.9814 
+## F-statistic: 2.767e+04 on 5 and 2618 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{evaluating-the-model-and-residual-analysis}{%
+\subparagraph{Evaluating the Model and Residual
+Analysis}\label{evaluating-the-model-and-residual-analysis}}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+After running the summary above, we can see a few things:
+
+\begin{itemize}
+\item
+  The median residual value is around zero (at 14 cases), which is a
+  good sign.
+\item
+  Additionally, the minimum and maximum values of the residuals are
+  roughly around the same, albeit leaning a bit more on the minimum side
+  of at -7192 and 4883 respectively.
+\item
+  Our Multiple R-squared value is 0.9825, which indicates that these
+  terms by county account for about 98.25\% of the variability in the
+  number of confirmed COVID-19 cases by county for April 20th, 2020.
+  This seems to be a pretty good result for our regression model.
+\end{itemize}
+
+Although this seems to be a good sign, we need to check our residuals to
+see if this qualifies as a suitable regression model.
+
+When plotting residuals (below), we can see that residuals are not
+uniformly scattered around zero:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(}\KeywordTok{fitted}\NormalTok{(covid_lm),}\KeywordTok{resid}\NormalTok{(covid_lm))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ZAlexander_discuss13_files/figure-latex/unnamed-chunk-18-1.pdf}
+
+I'm not sure if this is due to some very large outliers and skewed cases
+data, but we can also see that there are a fair amount of outliers
+towards both ends of the q-q plot. This can be visualized in a
+quantile-versus-quantile (Q-Q) plot (see below):
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{qqnorm}\NormalTok{(}\KeywordTok{resid}\NormalTok{(covid_lm))}
+\KeywordTok{qqline}\NormalTok{(}\KeywordTok{resid}\NormalTok{(covid_lm))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ZAlexander_discuss13_files/figure-latex/unnamed-chunk-19-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{hist}\NormalTok{(}\KeywordTok{resid}\NormalTok{(covid_lm))}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ZAlexander_discuss13_files/figure-latex/unnamed-chunk-19-2.pdf}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\hypertarget{was-the-linear-model-appropriate}{%
+\subparagraph{Was the Linear Model
+Appropriate?}\label{was-the-linear-model-appropriate}}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+From this residual analysis, we can conclude that a linear model here
+may not be very appropriate, or accurate for areas with larger numbers
+of confirmed cases (i.e.~counties with larger populations). However,
+this may be effective to predict cases for counties with smaller
+populations. At this point, I think I would not call this linear model
+appropriate, however, further manipulation of the initial dataset to
+exclude counties with very large populations may make this a more
+effective model.
+
+\hypertarget{predictions-for-april-21st-2020}{%
+\subparagraph{Predictions for April 21st,
+2020}\label{predictions-for-april-21st-2020}}
+
+From the t-test below, it does look like a 95\% confidence interval
+includes zero. However, it isn't a very tight range between the lower
+and upper bounds, indicating that the predictions for confirmed cases
+could be drastically off, especially for smaller populations. This
+confirms that it would be beneficial to adjust the original dataset to
+build out a more productive and efficient model.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{predicted <-}\StringTok{ }\KeywordTok{predict}\NormalTok{(covid_lm, covid_test)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: 'newdata' had 2783 rows but variables found have 2643 rows
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{delta <-}\StringTok{ }\NormalTok{predicted }\OperatorTok{-}\StringTok{ }\NormalTok{covid_test}\OperatorTok{$}\NormalTok{cases}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning in predicted - covid_test$cases: longer object length is not a multiple
+## of shorter object length
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{t.test}\NormalTok{(delta, }\DataTypeTok{conf.level =} \FloatTok{0.95}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+##  One Sample t-test
+## 
+## data:  delta
+## t = -0.16414, df = 2765, p-value = 0.8696
+## alternative hypothesis: true mean is not equal to 0
+## 95 percent confidence interval:
+##  -167.8447  141.9148
+## sample estimates:
+## mean of x 
+## -12.96496
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(delta)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{ZAlexander_discuss13_files/figure-latex/unnamed-chunk-20-1.pdf}
+
+\end{document}
