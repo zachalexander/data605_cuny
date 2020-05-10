@@ -2,7 +2,9 @@
 title: 'DATA 605 - Homework #14'
 author: "Zach Alexander"
 date: "5/9/2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
