@@ -1,0 +1,255 @@
+---
+title: 'DATA 605 - Homework #15'
+author: "Zach Alexander"
+date: "5/16/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+***
+
+#### Question #1
+
+> Find the equation of the regression line for the given points. Round any final values to the nearest hundredth, if necessary.
+
+$$(5.6, 8.8), (6.3, 12.4), (7, 14.8), (7.7, 18.2), (8.4, 20.8)$$
+
+We can utilize the equation:
+
+$$\beta_1 = \frac{\sum_{i=1}^{n}(x_{i} - \overline{X})(y_{i} - \overline{Y})}{\sum_{i=1}^{n}(x_{i} - \overline{X})^2}$$ 
+$$\beta_1 = \frac{Cov(x,y)}{Var(x)}$$
+
+$$\beta_0 = \overline{Y} - m\overline{X}$$
+
+To find the regression line of the given points, we can create a dataframe.
+
+```{r}
+df <- data.frame(x=c(5.6, 6.3, 7, 7.7, 8.4), y=c(8.8, 12.4, 14.8, 18.2, 20.8))
+```
+
+Since we have all of the information we need to fill in the formula, we can solve by doing the following calculations:  
+
+```{r}
+X <- mean(df$x)
+Y <- mean(df$y)
+varx <- var(df$x)
+covxy <- cov(df$x, df$y)
+Beta1 <- covxy/varx
+Beta <- Y - (Beta1*X)
+
+Beta
+Beta1
+```
+
+Therefore, our equation is $y = -14.8 + 4.26x$  
+
+We can check our work by using the `lm()` function to solve:
+
+```{r}
+lm_df <- lm(y ~ x, df)
+summary(lm_df)
+```
+
+**SOLUTION: It is confirmed, we can see from our output that the equation is $y = -14.80 + 4.26x$**
+
+***
+
+#### Question #2
+
+> Find all local maxima, local minima, and saddle points for the function given below. Write your answer(s) in the form (x, y, z). Separate multiple points with a comma.
+
+$$f(x,y) = 24x - 6xy^{2} - 8y^{3}$$
+We can solve this in multiple parts:  
+
+$$f_x(x,y)=\frac{d}{dx}(24x-6xy^2-8y^3)$$
+$$f_x(x,y)=24-6y^2$$
+$$f_y(x,y)=\frac{d}{dx}(24x-6xy^2-8y^3)$$
+$$f_y(x,y)=-12xy-24y^2$$
+Therefore, we can now set $f_x(x,y)$ and $f_y(x,y)$ equal to $0$ and solve:  
+
+$$0=24-6y^2$$
+$$6y^2=24$$
+$$y=2$$
+
+
+$$0=-12xy-24y^2$$
+$$24y^2=-12xy$$
+$$-2y^2=xy$$
+$$-2y=x$$
+Therefore, we know that:  
+
+When $y = 2$, $x = -4$, and when $y = -2$, $x = 4$. Since we now know $x$ and $y$, we can substitute these values back into the original equation and solve:  
+
+$$f(-4,2) = 24(-4) - 6(-4)(2)^{2} - 8(2)^{3}$$
+$$f(-4,2) = -96 - 6(-4)(2)^{2} - 8(2)^{3}$$
+$$f(-4,2) = 0 - 8(2)^{3}$$
+$$f(-4,2) = -64$$
+
+$$f(4,-2) = 24(4) - 6(4)(-2)^{2} - 8(-2)^{3}$$
+$$f(4,-2) = 96 - 96 - 8(-8)$$
+$$f(4,-2) = 64$$
+
+With this solved, we now know that the critical points are:  
+
+$(x, y, z) = (4, -2, 64)$ and $(-4, 2, -64)$  
+
+To find the saddle points, we can utilize the Second Derivative test:  
+
+Let $D = f_{xx}(x_0,y_0) \times f_{xy}(x_0,y_0) - f^{2}_{xy}(x_0,y_0)$ for a $P$  
+
+If we find that $D < 0$, then we can say that $P$ is a saddle point of $f$.  
+
+$$f_{xx}(x,y) = \frac{d}{dx}(24-6y^2) = 0$$
+$$f_{yy}(x,y) = \frac{d}{dx}(-12xy-24y^2) = -12x - 48y$$
+$$f_{xy}(x,y) = \frac{d}{dx}(24-6y^2) = -12$$
+
+And now by substituting $D(x_0,y_0)$ into our equation:  
+
+$$D(-4,2) = (0)((-12 \times -4) - (48 \times 2)) - (-12 \times 2)^2$$
+
+$$D(-4,2) = 0 - (-12 \times 2)^2$$
+
+$$D(-4,2) = -576$$
+
+$$D(4,-2) = (0)((-12 \times 4) - (48 \times -2)) - (-12 \times -2)^2$$
+
+$$D(4,-2) = 0 - (-12 \times -2)^2$$
+
+$$D(4,-2) = -576$$
+
+**SOLUTION: To summarize, we found that our critical points are $(x, y, z) = (4, -2, 64)$ and $(-4, 2, -64)$, and since both $D(-4,2)$ and $D(4, -2)$ are negative, we can also say that $(-4,2)$ and $(4,2)$ are the saddle points.**  
+
+***
+
+#### Question #3
+
+> A grocery store sells two brands of a product, the "house" brand and a "name" brand. The manager estimates that if she sells the "house" brand for $x$ dollars and the "name" brand for $y$ dollars, she will be able to sell $81 - 21x + 17y$ units of the "house" brand and $40 + 11x - 23y$ units of the "name" brand.  
+
+> Step 1. Find the revenue function $R(x, y)$.  
+
+To find the revenue function, we know that the manager can sell the house and name brand for $x$ and $y$ dollars respectively:  
+
+$$R_x = x \times (81-21x+17y)$$
+$$R_x = 81x-21x^2+17xy$$
+
+$$R_y = y \times (40+11x - 23y)$$
+$$R_y = 40y+11xy - 23y^2$$
+
+So we know that:  
+
+$$R(x,y) = 81x - 21x^2 + 17xy + 40y + 11xy - 23y^2$$
+
+$$R(x,y) = 81x - 21x^2 + 28xy + 40y - 23y^2$$
+**SOLUTION: The revenue function is $R(x,y) = 81x - 21x^2 + 28xy + 40y - 23y^2$ **  
+
+
+> Step 2. What is the revenue if she sells the "house" brand for $2.30 and the "name" brand for $4.10?  
+
+For this, we can just substitute into our revenue function and solve:  
+
+$$R(x,y) = 81x - 21x^2 + 28xy + 40y - 23y^2$$
+$$R(2.3, 4.1) = 81(2.3) - 21(2.3)^2 + 28(2.3)(4.1) + 40(4.1) - 23(4.1)^2$$
+
+$$R(2.3, 4.1) = 186.3 - 111.09 + 264.04 + 164 - 386.63$$
+
+$$R(2.3, 4.1) = 116.62$$
+
+**SOLUTION: If the manager sells the "house" brand for 2.30 dollars and the "name" brand for 4.10 dollars, then her revenue will be 116.62 dollars.**  
+
+***
+
+#### Question #4
+
+> A company has a plant in Los Angeles and a plant in Denver. The firm is committed to produce a total of 96 units of a product each week. The total weekly cost is given by $C(x, y) = \frac{1}{6}x^2 + \frac{1}{6}y^2 + 7x + 25y + 700$, where $x$ is the number of units produced in Los Angeles and $y$ is the number of units produced in Denver. How many units should be produced in each plant to minimize the total weekly cost?  
+
+
+Since the company is committed to producing a total of 96 units of product each week, we know that:  
+
+$$x+y=96$$
+
+We also know that our weekly cost for both $x$ and $y$ is:  
+
+$$C(x, y) = \frac{1}{6}x^2 + \frac{1}{6}y^2 + 7x + 25y + 700$$
+
+With these in mind, we can substitute the value of $y$ into the equation since $y=96-x$:  
+
+$$C(x) = \frac{1}{6}x^2 + \frac{1}{6}(96-x)^2 + 7x + 25(96-x) + 700$$
+
+$$C(x) = \frac{1}{6}x^2 + \frac{1}{6}(9216 - 192x + x^2) + 7x + 25(96-x) + 700$$
+
+$$C(x) = \frac{1}{6}x^2 + 1536 - 32x + \frac{1}{6}x^2 + 7x + 2400-25x + 700$$
+
+$$C(x) = \frac{1}{3}x^2 - 50x + 4636$$
+
+Then, we can find $\frac{dC}{dx}$:  
+
+$$\frac{dC}{dx}=\frac{2}{3}x - 50$$
+And to find $x$, we can solve for $0$:  
+
+$$0=\frac{2}{3}x - 50$$
+
+$$50=\frac{2}{3}x$$ 
+
+$$x=75$$
+
+Using the Second Derivative test:  
+
+$$\frac{d^{2}C}{dx^{2}} = \frac{2}{3}$$
+
+And since this is greater than $0$, we know that $x=75$ is the relative minima. 
+
+**SOLUTION: Since we've found that $x=75$ is the relative minima, we can conclude that in order to minimize the total weekly cost, the company will want to produce 75 units in Los Angeles and 21 units (96-75 units) in Denver.**  
+
+***
+
+#### Question #5
+
+> Evaluate the double integral on the given region.  
+
+$$\int\int(e^{8x+3y}) dA; \\ R:2\leq x \leq 4 \ and \ 2 \leq y \leq 4$$
+
+> Write your answer in exact form without decimals.  
+
+To solve the double integral, we can do the following:  
+
+
+$$\int^{4}_2\int^{4}_{2}(e^{8x+3y}) \ dy \ dx$$ 
+We can integrate the inside integral first:  
+
+$$\int^{4}_{2}(e^{8x+3y}) \ dy $$ 
+With $u$ substitution:  
+
+$$u = 8x+3y$$ 
+$$\frac{du}{dy} = 3 \ ; \ dy=\frac{1}{3}du$$  
+
+Therefore, $\int^{4}_{2}(e^{8x+3y}) \ dy$ can be:  
+
+$$\frac{1}{3}\int^{4}_{2}e^{u}du = \frac{1}{3}(e^{u}|^4_2)$$
+And now by substituting back in $(8x + 3y)$ in place of $u$ and $y$:  
+
+$$\frac{1}{3}[e^{(8x+(3*4))} - e^{(8x-(3*2))}]$$
+$$\frac{1}{3}[e^{(8x+12)} - e^{(8x+6)}]$$
+
+Finally, we can solve the outside integral by substituting this back in:  
+
+$$\int^{4}_2\frac{1}{3}[e^{(8x+12)} - e^{(8x+6)}] \ dx$$ 
+$$\int^{4}_2\frac{1}{3}[e^{(8x+12)}]\ dx - \int^{4}_2\frac{1}{3}[e^{(8x+6)}] \ dx$$ 
+$$\frac{1}{3}* \frac{1}{8}e^{(8x+12)}|^{4}_{2} - \frac{1}{3}* \frac{1}{8}e^{(8x+6)}|^{4}_{2}$$ 
+$$\frac{1}{24}[e^{(8(4)+12)} - e^{(8(2)+12)}] - \frac{1}{24}[e^{(8(4)+6)} - e^{(8(2)+6)}]$$ 
+
+$$\frac{1}{24}[e^{(32+12)} - e^{(16+12)}] - \frac{1}{24}[e^{(32+6)} - e^{(16+6)}]$$ 
+
+$$\frac{1}{24}[e^{(32+12)} - e^{(16+12)} - e^{(32+6)} + e^{(16+6)}]$$ 
+$$\frac{1}{24}[e^{44} - e^{28} - e^{38} + e^{22}]$$ 
+And we can now solve by calculating:  
+```{r}
+paste0('The answer is: ', ((1/24)*(exp(44)-exp(38)-exp(28)+exp(22))))
+(1/24)*(exp(44)-exp(38)-exp(28)+exp(22))
+```
+
+**SOLUTION: After evaluating the double integral, we get a value of 534,155,947,497,085,184 or $5.3411559 \times 10^{17}$ **  
