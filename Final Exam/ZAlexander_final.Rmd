@@ -1,0 +1,268 @@
+---
+title: "DATA 605 - Final Project"
+author: "Zach Alexander"
+date: "5/17/2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(tidyverse)
+require(dplyr)
+require(tidyr)
+require(kableExtra)
+require(knitr)
+```
+
+***
+
+### Instructions
+
+Your final is due by the end of the last week of class. You should post your solutions to your GitHub account or RPubs. You are also expected to make a short presentation via YouTube and post that recording to the board. This project will show off your ability to understand the elements of the class.
+
+### Problem 1
+
+***
+> Using R, generate a random variable X that has 10,000 random uniform numbers from 1 to N, where N can be any number of your choosing greater than or equal to 6. Then generate a random variable Y that has 10,000 random normal numbers with a mean of $\mu=\sigma=\frac{(N+1)}{2}$
+
+***
+
+Following the instructions from above, here is my R syntax to generate a random variable X:  
+
+```{r}
+set.seed(123)
+
+N <- 10
+X <- runif(10000, 1, N)
+Y <- rnorm(10000, (N+1)/2, (N+1)/2)
+```
+
+From the above syntax, you can see that I've created a variable $X$ with 10,000 random uniform numbers from 1 to $N$ ($N=10$). Additionally, I've created a random variable $Y$ that has 10,000 random normal numbers with a $\mu$ and $\sigma$ of $\frac{N+1}{2}$. 
+
+***
+
+> *Probability*: Calculate as a minimum the below probabilities a through c. Assume the small letter $x$ is estimated as the median of the $X$ variable, and the small letter $y$ is estimated as the 1st quartile of the $Y$ variable.  Interpret the meaning of all probabilities.  
+
+***
+
+To work through this, I'll first have to calculate $x$ (the median) and $y$ (the first quartile). Additionally, I've saved $X$ and $Y$ in a dataframe can stored the total number of rows (10,000) in a variable:  
+```{r}
+x <- quantile(X, 0.50)
+y <- quantile(Y, 0.25)
+df <- data.frame(X = X, Y = Y)
+total_rows <- nrow(df)
+```
+
+***
+
+> *a)* $P(X>x \ | \ X>y)$
+
+***
+
+We can use the following equation to find the probability:  
+
+$$P(A \ | \ B) = \frac{P(A \ \cap \ B)}{P(B)} \\ where \ A = P(X>x) \ and \ B = P(X>y)$$  
+
+With this in mind, we can solve:  
+```{r}
+P_AandB <- nrow(df %>% filter(X > x & X > y)) / total_rows
+P_B <- nrow(df %>% filter(X > y)) / total_rows
+
+P_AgivenB <- P_AandB / P_B
+P_AgivenB
+```
+
+**Solution: The probability $P(X>x \ | \ X>y) = 0.5510$, which means that the probability that a uniform number from 1 to 10 is greater than the median of 5.45 *given* this number is greater than 1.84 is 0.5510.**  
+
+***
+
+> *b)* $P(X>x, \ Y>y)$  
+
+***
+
+We can use the following equation to solve this portion:  
+
+$$P(A,B)=P(A) \times P(B) \\ where \ A=N(X>x) \ and \ B=N(Y>y)$$  
+
+With this in mind, we can solve:  
+```{r}
+P_AandB_2 <- nrow(df %>% filter(X > x & Y > y)) / total_rows
+P_AandB_2
+```
+
+**Solution: The probability $P(X>x, \ Y>y) = 0.3756$, which means that the probability that a uniform number from 1 to 10 is greater than the median of 5.45 *and* this number is greater than 1.84 is 0.3756.**  
+
+***
+> *c)* $P(X<x, \ X>y)$  
+
+***
+
+Similar to part a, we can use the following equation to solve:  
+
+$$P(A \ | \ B) = \frac{P(A \ \cap \ B)}{P(B)} \\ where \ A = P(X<x) \ and \ B = P(X>y)$$  
+
+\br
+
+With this in mind, we can solve:  
+
+```{r}
+P_AandB <- nrow(df %>% filter(X < x & X > y)) / total_rows
+P_B <- nrow(df %>% filter(X > y)) / total_rows
+
+P_AgivenB_2 <- P_AandB / P_B
+P_AgivenB_2
+```
+
+\br
+
+**Solution: The probability $P(X<x \ | \ X>y) = 0.4490$, which means that the probability that a uniform number from 1 to 10 is less than the median of 5.45 *given* this number is greater than 1.84 is 0.4490.**  
+
+***
+
+> Investigate whether $P(X>x \ and \ Y>y)=P(X>x)P(Y>y)$ by building a table and evaluating the marginal and joint probabilities.  
+
+***
+
+To do this investigation, we'll first have to calculate the joint probabilities:  
+
+We'll calculate joint probabilities by using the equation:  
+
+$$P(A \cap B) = P(A \times B)$$
+Therefore, we first will create a few columns to distinguish whether our values meet the following conditions:  
+
++ Is $X > x$ or $X < x$?
++ Is $Y > y$ or $Y < y$?
+
+Then, we can take the count of each condition, and multiply the four conditions to get their respective joint probabilities:  
+
++ $P((X > x) \times (Y < y))$
++ $P((X < x) \times (Y < y))$
++ $P((X < x) \times (Y > y))$
++ $P((X > x) \times (Y > y))$
+
+Below is the R syntax I used to do this, by using `group_by()` and `summarise()` functions to do the calculations with the `tidyverse` package:  
+
+```{r}
+# Joint probabilities
+prob_df <- df %>% 
+  mutate(A = ifelse(X > x, " X > x", " X < x"), B = ifelse(Y > y, " Y > y", " Y < y")) %>% 
+  group_by(A, B) %>% 
+  summarise(count = n()) %>% 
+  mutate(prob = count / total_rows)
+```
+
+Next, we need to back up a bit and examine the marginal probabilities of $P(A)$ and $P(B)$ independently:  
+
+Intuitively we know that $x = median(X)$, therefore, half of the values of $X$ > $x$ and the other half of $X$ < $x$. Similarly, since we know that $y = first \ quartile \ of \ Y$, a quarter of $Y$ < $y$ and the remaining three fourths of the values of $Y$ > $y$. Therefore, the marginal probabilities are:  
+
++ $P(X > x) = 0.50$  
++ $P(X < x) = 0.50$  
++ $P(Y > y) = 0.75$  
++ $P(Y < y) = 0.25$  
+
+We can check these assumptions by reworking our table:  
+
+```{r}
+prob_df <- prob_df %>% 
+  ungroup() %>% 
+  group_by(A) %>% 
+  summarise(count = sum(count), prob = sum(prob)) %>% 
+  mutate(B = "Total Prob") %>% 
+  bind_rows(prob_df)
+
+prob_df <- prob_df %>% 
+  ungroup() %>% 
+  group_by(B) %>% 
+  summarise(count = sum(count), prob = sum(prob)) %>% 
+  mutate(A = "Total Prob") %>% 
+  bind_rows(prob_df)
+```
+
+
+And by printing our table, we can see that our marginal probabilities that we assumed are confirmed:  
+
+```{r}
+prob_df %>%
+  select(-count) %>% 
+  spread(A, prob) %>%
+  rename("Conditions" = B) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c('striped'), full_width = FALSE)
+```
+
+**Solution: After generating the table above, it appears that $P(X>x \ and \ Y>y)$ does equal $P(X>x)P(Y>y)$, since they both have a value of 0.3756. By doing the calculations to check, $P(X>x)P(Y>y) = (0.50)(0.75) = 0.375$ and $P(X>x \ and \ Y>y) = 0.375$ as well.**  
+
+***
+
+> Check to see if independence holds by using Fisher’s Exact Test and the Chi Square Test. What is the difference between the two? Which is most appropriate?
+
+***
+
+In order to run our Fisher's Exact Test and Chi Square Test, we'll first need to find the counts of each our conditions, similar to the previous question and create a two-by-two table:  
+
+```{r}
+X_plus <- nrow(df %>% 
+  filter(X > x))
+
+X_lesseq <- nrow(df %>% 
+  filter(X <= x))
+
+Y_lesseq <- nrow(df %>% 
+  filter(Y <= y))
+
+Y_plus <- nrow(df %>% 
+  filter(Y > y))
+
+freq_matrix <- matrix(c(X_plus, X_lesseq, Y_plus, Y_lesseq), 
+                      nrow = 2, ncol = 2, byrow = TRUE,
+                      dimnames = list(c("x", "y"),
+                                c("X > x; Y > y", "X <= x; Y <= y")))
+```
+
+With our frequency table ready to go, we can see our counts below:
+
+```{r}
+freq_matrix %>% 
+  kable() %>%
+  kable_styling(bootstrap_options = c('striped'), full_width = FALSE)
+```
+
+Now, we are ready to run our Fisher's Exact Test:  
+
+```{r}
+fisher.test(freq_matrix)
+```
+
+And here is the Chi-Square Test:  
+
+```{r}
+chisq.test(freq_matrix)
+```
+
+When looking at both of the outputs, we can see that we reject the null hypothesise for both, given that the p-value is less than 0.05 for the 95 percent confidence interval. Since the Fisher's Exact Test is typically used for smaller sample sizes, and our sample is of 10,000 observations, it would be more appropriate to use the Chi-Square Test. 
+
+**Solution: **
+
++ **Our $H_0$ = There is no relationship between X and Y.**  
+
++ **Our $H_a$ = There is a significant relationship between X and Y.**  
+
+**Given our outputs, independence does not hold when we run the Fisher's Exact Test and Chi-Square test. We reject the null hypothesis that there is no relationship between X and Y. Since the Fisher's Exact Test is typically used on smaller sample sizes, and we have a large sample size of 10,000 observations, it would be more appropriate to rely on the output from our Chi-Square Test. **  
+
+***
+
+### Instructions
+
+You are to register for Kaggle.com (free) and compete in the House Prices: Advanced Regression Techniques competition: [https://www.kaggle.com/c/house-prices-advanced-regression-techniques]([https://www.kaggle.com/c/house-prices-advanced-regression-techniques). I want you to do the following.
+
+### Problem 2
+
+***
+
+> Descriptive and Inferential Statistics. Provide univariate descriptive statistics and appropriate plots for the training data set.  Provide a scatterplot matrix for at least two of the independent variables and the dependent variable. Derive a correlation matrix for any three quantitative variables in the dataset.  Test the hypotheses that the correlations between each pairwise set of variables is 0 and provide an 80% confidence interval.  Discuss the meaning of your analysis.  Would you be worried about familywise error? Why or why not?
+
+***
+
+
