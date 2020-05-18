@@ -14,6 +14,7 @@ require(dplyr)
 require(tidyr)
 require(kableExtra)
 require(knitr)
+require(psych)
 ```
 
 ***
@@ -264,5 +265,205 @@ You are to register for Kaggle.com (free) and compete in the House Prices: Advan
 > *Descriptive and Inferential Statistics*: Provide univariate descriptive statistics and appropriate plots for the training data set.  Provide a scatterplot matrix for at least two of the independent variables and the dependent variable. Derive a correlation matrix for any three quantitative variables in the dataset.  Test the hypotheses that the correlations between each pairwise set of variables is 0 and provide an 80% confidence interval.  Discuss the meaning of your analysis.  Would you be worried about familywise error? Why or why not?
 
 ***
+
+```{r, warning=FALSE, message=FALSE}
+kaggle_df <- read_csv('https://raw.githubusercontent.com/zachalexander/data605_cuny/master/Final%20Exam/train.csv')
+```
+
+```{r}
+# summary(kaggle_df)
+```
+
+On a quick look at the summary, I decided to pull out the numeric values to explore a bit more:
+```{r}
+numerics <- data.frame(summary(kaggle_df))
+
+numerics <- numerics %>% 
+  filter(!is.na(Freq))
+
+numerics <- data.frame(numerics %>% 
+  filter(!grepl('Class', Freq), !grepl('Length', Freq), !grepl('Mode', Freq)) %>% 
+  separate(Freq, c('Value', 'Count'), sep = ":", remove = TRUE))
+
+numerics$Var2 <- trimws(numerics$Var2)
+numerics$Value <- trimws(numerics$Value)
+numerics$Count <- round(as.numeric(trimws(numerics$Count)), 1)
+
+numerics <- numerics %>%
+  select(Var2, Value, Count) %>%
+  spread(Value, Count) %>% 
+  rename("Attribute" = "Var2", "Q1" = `1st Qu.`, "Q3" = `3rd Qu.`, "Max" = "Max.", "Min" = "Min.", "NA" = "NA's") %>% 
+  select(Attribute, Min, Q1, Median, Mean, Q3, Max, `NA`)
+
+kable(numerics) %>% 
+  kable_styling(bootstrap_options = 'striped')
+```
+
+With my `numerics` dataframe ready, I can now set up some visuals by splitting the dataframe into two, one with all quantative variables, and the other with categorical data:  
+
+```{r}
+kaggle_numerics <- kaggle_df[, (colnames(kaggle_df)) %in% numerics$Attribute]
+kaggle_categorical <- kaggle_df[, !(colnames(kaggle_df) %in% numerics$Attribute)]
+```
+
+
+***
+
+##### Exploring the quantitative variables
+
+```{r, fig.width=12, fig.height=12}
+kaggle_numerics %>% 
+  dplyr::select(2:11) %>%
+  pairs.panels(method = "pearson", hist.col = "#8bb397")
+```
+```{r, fig.width=12, fig.height=12}
+kaggle_numerics %>% 
+  dplyr::select(12:21) %>%
+  pairs.panels(method = "pearson", hist.col = "#8bb397")
+```
+
+```{r, fig.width=12, fig.height=12}
+kaggle_numerics %>% 
+  dplyr::select(22:31) %>%
+  pairs.panels(method = "pearson", hist.col = "#8bb397")
+```
+
+```{r, fig.width=12, fig.height=12}
+kaggle_numerics %>% 
+  dplyr::select(32:38) %>%
+  pairs.panels(method = "pearson", hist.col = "#8bb397")
+```
+
+After creating a few plot matrices with our quantitative data, I thought there were a few initial takeaways:  
+
++ Many of the living spaces, and the square footage values seem to show stronger correlations with one another. This makes sense given that many times, the square footage of one floor will likely be similar square footage to another floor in the house.  For instance, there's a strong correlation between the first floor square footage and the basement square footage. When thinking about our regression later, it's nice to know that there are multiple attributes here that could serve as proxies (if needed).
+
++ Additionally, I'm seeing a gradual, positive trend towards larger areas of garages the later they are built in the 20th century -- for instance, garages built in the early part of the 20th century seem to be smaller than those that are built in the later 1900s and early 2000s. This may be something to look into further, and it's relationship with the Sale Price later on.  
+
++ It's interesting to see too that the year the house is built has a relationship with the rating of overall material and finish quality of the house. Again, this make sense, but it would be valueable to see if this has a relationship with Sale Price.
+
+Now, let's explore the categorical variables a bit.   
+
+
+***
+
+##### Exploring a few of the categorical variables
+
+```{r}
+table(kaggle_categorical$LandSlope)
+# table(kaggle_categorical$BldgType)
+table(kaggle_categorical$HouseStyle)
+# table(kaggle_categorical$RoofStyle)
+table(kaggle_categorical$RoofMatl)
+# table(kaggle_categorical$ExterCond)
+table(kaggle_categorical$CentralAir)
+# table(kaggle_categorical$Utilities)
+table(kaggle_categorical$HeatingQC)
+table(kaggle_categorical$SaleType)
+table(kaggle_categorical$SaleCondition)
+table(kaggle_categorical$Foundation)
+```
+
+After looking through a large number of categorical values, and checking frequencies, a few things stood out to me:  
+
++ It looks like there's a majority of houses that are built on gentle slopes, however, there's a proportion that are built on moderate or severe slopes -- this could be something to look into further when building out the regression later on. It may be interesting to see if there is any correlation here with the Sale Price.  
+
++ Similarly, the foundation material seems to be split heavily between cinder blocks and poured concrete. This is another feature that may be useful to explore later to see if this has an affect on housing prices, or if there is a connection between the year a house was built and which type of foundation was used.  
+
++ Finally, Sale Type and Sale Condition were interesting values and their frequencies suggest that there isn't a "one-size-fits-all" approach to certain transactions, making this an enticing set of features to explore further.  
+
+***
+
+##### Developing a scatterplot matrix
+
+After plotting all of my quantitative variables earlier, I thought I'd hone in on a few that may be useful to explore their relationship with the Sale Price variable. You can find my plot below: 
+
+```{r, fig.width=12, fig.height=12}
+pairs(kaggle_df[, c('1stFlrSF', 'GrLivArea', 'GarageArea', 'TotalBsmtSF', 'YearBuilt', 'SalePrice' )], pch = 19)
+```
+
+*** 
+##### Developing a correlation matrix  
+
+For our correlation matrix, I will use `GrLivArea`, `1stFlrSF`, and `SalePrice`. And taking a few of these same attributes, I thought it would be interesting to plot these in a correlation matrix:  
+
+```{r}
+kaggle_numerics %>% 
+  dplyr::select(`1stFlrSF`, `GrLivArea`, SalePrice) %>%
+  pairs.panels(method = "pearson", hist.col = "#8bb397")
+
+corr_matrix <- kaggle_numerics %>% 
+  select(`1stFlrSF`, GrLivArea, SalePrice) %>% 
+  cor() %>% 
+  as.matrix()
+```
+
+As we can see from above, all three attributes, the square footage of the first floor, the above grade (ground) living area and the Sale Price all seem to have a positive relationship with one another. All three distributions also appear to be unimodal and right-skewed. Below is the official correlation matrix:  
+
+```{r}
+kable(corr_matrix) %>% 
+  kable_styling(bootstrap_options = 'striped', full_width = FALSE)
+```
+
+***
+
+##### Hypothesis testing on correlation matrix 
+
+Now, although these correlations seem to be quite strong, we can do some hypothesis testing on their relationships at an 80-percent confidence interval:  
+
+```{r}
+corr1 <- cor.test(kaggle_numerics$SalePrice, kaggle_numerics$`1stFlrSF`, method = 'pearson', conf.level = 0.80)
+
+corr2 <- cor.test(kaggle_numerics$SalePrice, kaggle_numerics$GrLivArea, method = 'pearson', conf.level = 0.80)
+
+corr3 <- cor.test(kaggle_numerics$`1stFlrSF`, kaggle_numerics$GrLivArea, method = 'pearson', conf.level = 0.80)
+
+corr1
+corr2
+corr3
+```
+
+**Solution: After running the three pairwise correlations between my variables of `SalePrice`, `1stFlrSF`, and `GrLivArea`, I can see from the outputs that all three accept the alternative hypothesis that the true correlation is not equal to zero and that there is a positive relationship between these attributes. Therefore, this rejects the null hypothesis that states that the correlations between each pairwise set of variables is zero. I know this to be true since the p-values for all three of my Person's correlation tests are less than 0.05.**  
+
+**Solution: Additionally, since we are dealing with a large sample size, and our correlation tests are yielding very small p-values, all less than 0.001, I'm not worried about family-wise error when measuring relationships across these three attributes. With p-values this low, it creates a solid argument that we aren't running into a Type 1 error here.**  
+
+***
+
+> *Linear Algebra and Correlation*: Invert your correlation matrix from above. (This is known as the precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix. Conduct LU decomposition on the matrix. 
+
+***
+
+Remembering that the inverse of a matrix multiplied by a matrix will become the identity matrix: 
+
+$$A^{−1}A=AA^{−1}=I$$
+
+We can find our precision matrix by using the `solve()` function in baseR to invert our correlation matrix:  
+
+```{r}
+prec_matrix <- solve(corr_matrix)
+prec_matrix
+```
+
+Then, we can multiple the precision matrix by the correlation matrix to confirm that we get the identity matrix:  
+
+$$ correlation \ matrix \times \ precision \ matrix = 
+
+\begin{bmatrix}
+    1 & 0 & 0 \\
+    0 & 1 & 0 \\
+    0 & 0 & 1
+\end{bmatrix} $$
+
+```{r}
+I_1 <- round(prec_matrix %*% corr_matrix, 2)
+I_2 <- round(corr_matrix %*% prec_matrix, 2)
+
+I_1
+I_2
+```
+
+As we can see above, we do indeed get the Identity Matrix when we multiply the precision matrix with the correlation matrix and vice-versa.  
+
+Finally, we will perform LU decomposition on the matrix:  
 
 
