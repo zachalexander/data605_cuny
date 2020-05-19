@@ -15,6 +15,8 @@ require(tidyr)
 require(kableExtra)
 require(knitr)
 require(psych)
+require(matrixcalc)
+require(pracma)
 ```
 
 ***
@@ -446,13 +448,13 @@ prec_matrix
 
 Then, we can multiple the precision matrix by the correlation matrix to confirm that we get the identity matrix:  
 
-$$ correlation \ matrix \times \ precision \ matrix = 
+$$ correlation \ matrix \times \ precision \ matrix = $$
 
 \begin{bmatrix}
     1 & 0 & 0 \\
     0 & 1 & 0 \\
-    0 & 0 & 1
-\end{bmatrix} $$
+    0 & 0 & 1 \\
+\end{bmatrix}
 
 ```{r}
 I_1 <- round(prec_matrix %*% corr_matrix, 2)
@@ -464,6 +466,201 @@ I_2
 
 As we can see above, we do indeed get the Identity Matrix when we multiply the precision matrix with the correlation matrix and vice-versa.  
 
-Finally, we will perform LU decomposition on the matrix:  
+***
+
+Finally, we will perform LU decomposition on the matrix. Fortunately, R has a package called `lu.decomposition()` that will find the upper and lower triangle matrices of our precision matrix, $U$ and $L$ respectively. The relationship between these two matrices is based on the formula:
+
+$$A = LU$$
+Where $A$ = our precision matrix, and $L$ and $U$ are the upper and lower triangular matrices of our precision matrix. We can see, when finding $L$ and $U$ below, we get these respective matrices:
+```{r}
+A <- prec_matrix
+L <- lu.decomposition(A)$L
+U <- lu.decomposition(A)$U
+
+round(L, 2)
+round(U, 2)
+```
+
+And when we multiply these together, we can obtain our original precision matrix ($A$):  
+
+```{r}
+round(A, 2)
+round(L %*% U, 2)
+```
+
+
+\begin{equation}
+  LU = A, where
+  \space
+  A = 
+  \begin{bmatrix}
+    1.68 & -0.46 & -0.69\\
+    -0.46 & 2.14 & -1.23\\
+    -0.69 & -1.23 & 2.29\\
+  \end{bmatrix}
+  \space
+  = 
+  \space
+  \begin{bmatrix}
+    1.00 & 0.00 & 0.00\\
+    -0.27 & 1.00 & 0.00\\
+    -0.41 & -0.71 & 1.00\\
+  \end{bmatrix}
+  \space
+    \begin{bmatrix}
+    1.68 & -0.46 & -0.69\\
+    0.00 & 2.01 & -1.42\\
+    0.00 & 0.00 & 1.00\\
+  \end{bmatrix}
+  \space
+  = LU 
+\end{equation}
+
+
+
+***
+
+> *Calculus-Based Probability & Statistics*: Many times, it makes sense to fit a closed form distribution to data. Select a variable in the Kaggle.com training dataset that is skewed to the right, shift it so that the minimum value is absolutely above zero if necessary. Then load the MASS package and run fitdistr to fit an exponential probability density function. (See  https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/fitdistr.html ). Find the optimal value of $\lambda$ for this distribution, and then take 1000 samples from this exponential distribution using this value (e.g., rexp(1000, $\lambda$)).  Plot a histogram and compare it with a histogram of your original variable. Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF). Also generate a 95% confidence interval from the empirical data, assuming normality. Finally, provide the empirical 5th percentile and 95th percentile of the data. Discuss.
+
+***
+
+For this exercise, we'll use the `GrLivArea` variable from the training dataset. When we plot it below on a histogram we can quickly see that it is skewed to the right:  
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(kaggle_df, aes(GrLivArea)) +
+  geom_histogram(aes(y = ..density..), colour="#555555", fill="#dddddd") +
+  geom_density(alpha=.6, fill="#333333") +
+  geom_vline(xintercept = min(kaggle_df$GrLivArea)) +
+  labs(title = "Above Ground Living Area (square feet)", align='middle') +
+  theme_minimal()
+```
+
+We can also see that the minimum value is absolutely above zero, so we do not need to perform any shifts. We can double check the data by using the `summary()` function, and we see that the minimum value is 334 square feet:  
+
+```{r}
+summary(kaggle_df$GrLivArea)
+```
+
+*** 
+
+##### Loading the MASS package and running fitdistr()
+
+After loading the `MASS` package and running `fitdistr()` to fit an exponential probability density function to our variable, I've found that that the optimal value of $\lambda$ for this distribution is 0.000659864.
+
+```{r, warning=FALSE, message=FALSE}
+require(MASS)
+
+exp_fit <- fitdistr(kaggle_df$GrLivArea, "exponential")
+est_rate <- exp_fit$estimate
+est_rate
+```
+
+***
+
+##### Plot a histogram comparing the exponential distribution to the original
+
+Using my newly found optimal value for lambda, I then was able to generate a 1000-sample variable from this exponential distribution:  
+
+```{r, warning=FALSE, message=FALSE}
+set.seed(123)
+pdf <- rexp(1000, est_rate)
+pdf_df <- as.data.frame(pdf)
+```
+
+I then plotted this distribution below, along with my original distribution for `GrLivArea`:
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(pdf_df, aes(pdf_df$pdf)) +
+  geom_histogram(aes(y = ..density..), colour="#555555", fill="#dddddd") +
+  geom_density(alpha=.6, fill="#333333") +
+  geom_vline(xintercept = min(pdf_df$pdf)) +
+  labs(title = "Exponential Distribution of Above Ground Living Area (square feet)", align='middle') +
+  theme_minimal()
+
+ggplot(kaggle_df, aes(GrLivArea)) +
+  geom_histogram(aes(y = ..density..), colour="#555555", fill="#dddddd") +
+  geom_density(alpha=.6, fill="#333333") +
+  geom_vline(xintercept = min(kaggle_df$GrLivArea)) +
+  labs(title = "Above Ground Living Area (square feet)", align='middle') +
+  theme_minimal()
+```
+
+A few takeaways when comparing the distributions:  
+
++ The original data for `GrLivArea` appears to be shaped as a more normal distribution, albeit right skewed, the most frequent square footage tends to be around 1500 and 1650 square feet.  
+
++ Alternatively, the exponential distribution of `GrLiveArea` appears to be even more right skewed, and takes on more of an exponential shape with a longer tail.
+
+***
+
+##### Find the 5th and 95th percentiles using CDF
+
+Next, I'll find the 5th and 95th percentiles using the cumulative distribution function (CDF). Thinking back to the formula from our reading, this function is:  
+
+$$F(x) = 1 - e^{-\lambda x}$$
+Since we already have found $\lambda = 0.000659864$, we can solve the equation accordingly for the 5th percentile:
+
+$$0.05 = 1 - e^{-0.000659864x}$$
+$$-0.95 = e^{-0.000659864x}$$
+$$-ln(0.95) = 0.000659864x$$
+$$\frac{-ln(0.95)}{0.000659864} = x$$
+$$77.73313 = x$$
+Similarly, we can find the 95th percentile by:  
+
+
+$$0.95 = 1 - e^{-0.000659864x}$$
+$$-0.05 = e^{-0.000659864x}$$
+$$-ln(0.05) = 0.000659864x$$
+$$\frac{-ln(0.05)}{0.000659864} = x$$
+$$4539.92 = x$$
+We can check these calculations using the `qexp()` function in R:  
+```{r}
+qexp(0.05, rate=est_rate)
+qexp(0.95, rate=est_rate)
+```
+
+It looks like these match the calculations above!  
+
+***
+
+##### Generate 95% confidence interval from empirical data
+
+Assuming normality, we can generate a 95% confidence interval from the empirical data by utilizing the following function:  
+
+$$\overline{X} \pm Z * \frac{\sigma}{\sqrt{n}}$$
+
+Since we have all of this information available to us, we can solve by utilizing the following:  
+
++ $Z$ = 1.96 (standard for a 95% confidence interval)  
+
++ $\overline{X}$ = mean value of `GrLivArea`  
+
++ $\sigma$ = standard deviation of `GrLivArea` mean  
+
++ $n$ = sample size of `GrLivArea`  
+
+```{r}
+X_cap <- mean(kaggle_df$GrLivArea)
+Z <- 1.96
+sigma <- std(kaggle_df$GrLivArea)
+n <- length(kaggle_df$GrLivArea)
+
+upper_bound <- X_cap + Z * (sigma / sqrt(n))
+lower_bound <- X_cap - Z * (sigma / sqrt(n))
+
+upper_bound
+lower_bound
+
+
+### talk about this tomorrow, notice that because original distribution is right skewed (not exactly normal), median would be better approximation here, so assuming normal distribution wouldn't be best here 1515.46 (mean) --> 1464 (median)
+
+### CI [1542 - 1488], median falls outside of this boundary
+
+mean(kaggle_df$GrLivArea)
+median(kaggle_df$GrLivArea)
+```
+
+```{r}
+quantile(kaggle_df$GrLivArea, c(0.05, 0.95))
+```
 
 
