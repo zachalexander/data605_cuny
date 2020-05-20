@@ -188,9 +188,9 @@ And by printing our table, we can see that our marginal probabilities that we as
 
 ```{r}
 prob_df %>%
-  select(-count) %>% 
+  dplyr::select(-count) %>% 
   spread(A, prob) %>%
-  rename("Conditions" = B) %>%
+  rename(" " = B) %>%
   kable() %>%
   kable_styling(bootstrap_options = c('striped'), full_width = FALSE)
 ```
@@ -292,10 +292,10 @@ numerics$Value <- trimws(numerics$Value)
 numerics$Count <- round(as.numeric(trimws(numerics$Count)), 1)
 
 numerics <- numerics %>%
-  select(Var2, Value, Count) %>%
+  dplyr::select(Var2, Value, Count) %>%
   spread(Value, Count) %>% 
   rename("Attribute" = "Var2", "Q1" = `1st Qu.`, "Q3" = `3rd Qu.`, "Max" = "Max.", "Min" = "Min.", "NA" = "NA's") %>% 
-  select(Attribute, Min, Q1, Median, Mean, Q3, Max, `NA`)
+  dplyr::select(Attribute, Min, Q1, Median, Mean, Q3, Max, `NA`)
 
 kable(numerics) %>% 
   kable_styling(bootstrap_options = 'striped')
@@ -395,7 +395,7 @@ kaggle_numerics %>%
   pairs.panels(method = "pearson", hist.col = "#8bb397")
 
 corr_matrix <- kaggle_numerics %>% 
-  select(`1stFlrSF`, GrLivArea, SalePrice) %>% 
+  dplyr::select(`1stFlrSF`, GrLivArea, SalePrice) %>% 
   cor() %>% 
   as.matrix()
 ```
@@ -614,8 +614,11 @@ $$\frac{-ln(0.05)}{0.000659864} = x$$
 $$4539.92 = x$$
 We can check these calculations using the `qexp()` function in R:  
 ```{r}
-qexp(0.05, rate=est_rate)
-qexp(0.95, rate=est_rate)
+edf_5 <- qexp(0.05, rate=est_rate)
+edf_95 <- qexp(0.95, rate=est_rate)
+
+edf_5
+edf_95
 ```
 
 It looks like these match the calculations above!  
@@ -650,17 +653,190 @@ lower_bound <- X_cap - Z * (sigma / sqrt(n))
 upper_bound
 lower_bound
 
-
-### talk about this tomorrow, notice that because original distribution is right skewed (not exactly normal), median would be better approximation here, so assuming normal distribution wouldn't be best here 1515.46 (mean) --> 1464 (median)
-
-### CI [1542 - 1488], median falls outside of this boundary
-
 mean(kaggle_df$GrLivArea)
 median(kaggle_df$GrLivArea)
 ```
+And below is the empirical 5th percentile and 95th percentile of the data:  
 
 ```{r}
-quantile(kaggle_df$GrLivArea, c(0.05, 0.95))
+emp_5 <- quantile(kaggle_df$GrLivArea, c(0.05, 0.95))[1]
+emp_95 <- quantile(kaggle_df$GrLivArea, c(0.05, 0.95))[2]
 ```
 
+```{r}
+calc_df <- data.frame(method= c('Exponential pdf percentiles', 'Empirical percentiles'), "percentile_5th" = c(edf_5, emp_5), "percentile_95th" = c(edf_95, emp_95))
+calc_df
+```
+
+**Solution:  My calculations for my exponential CDF percentiles and empirical percentiles can be summarized in the table above. Additionally, I found that when calculating a 95% confidence interval from my empirical data, I found this interval to be $[1488.51, 1542.42]$. I also calculated the mean and median from my empirical data, which equals $1515.46$ and $1464$ respectively. Given that our `GrLivArea` variable is right skewed, the 95% confidence interval that we produced is not very effective and doesn't map to the data very well. Our confidence interval should indicate that if we were to continuously sample houses from this area, with the same sample size of 1460, then we should expect the mean `GrLivArea` value to fall within our bounds of $[1488.51, 1542.42]$ about 95% of the time -- which isn't reflected well in the sense that the empirical median does not fall within this range, characteristic of a right skewed distribution. **  
+
+**Additionally, we found that when using the exponential pdf in an attempt to fit our empirical distribution, we see a large disparity between the 5th percentile of our exponential function (77.73) and our empirical data (848.00). This is also true when looking at the 95th percentiles that were calculated, the exponential pdf yielding 4539 square feet, and the empirical data yielding 2466.1 square feet. These percentiles mean that 95% of the houses in our training dataset have above ground living areas that fall below these markers. Therefore, the exponential percentile suggests that 95% of the houses have above ground living areas that are less than or equal to 4539 square feet, while the empirical data tells us that 95% of the hosues have above ground living areas of up to 2466.1 square feet. This is a large difference between the two, and shows that the empirical distribution we fit would not be a good estimator of our empirical data.**  
+
+***
+
+> *Modeling*: Build some type of multiple regression  model and submit your model to the competition board.  Provide your complete model summary and results with analysis.
+
+***
+
+##### Data processing before running the model
+ 
+Before we get started on building our multiple regression model, I thought it would be helpful to take a closer look at the training dataset, and to hone in on a few variables that seem like good attributes to include in our analysis.  
+
+Earlier, I developed a large number of correlation matrices and scatter plots to visualize interactions between some of the quantitative variables in the dataset. When looking back at some of this data, I thought the following attributes stood out as possible additions to our regression model:  
++ `1stFlrSF` (first floor square feet)  
++ `GrLivArea` (above ground living area square feet)  
++ `GarageArea` (size of garage in square feet)  
++ `TotalBsmtSF` (total square feet of basement area)    
++ `YearBuilt` (year house was built)  
++ `TotRmsAbvGrd` (total rooms above ground)  
++ `BedroomAbvGr` (bedrooms above ground)  
++ `BsmtUnfSF` (unfinished square feet of basement area)  
++ `YrSold` (year sold)  
+
+Additionally, I thought a few of the categorical variables stood out as possible effective attributes for predicting the Sale Price:  
+
++ `LandSlope` (slope of property)
++ `HouseStyle` (style of dwelling)
++ `CentralAir` (does the house have central air conditioning)
++ `SaleType` (type of sale)
++ `SaleCondition` (condition of sale)
++ `Foundation` (type of foundation)  
+
+With these variables of interest selected, I'll need to recode the categorical variables into quantitative values:  
+
+```{r, warning=FALSE, message=FALSE}
+kaggle_df$LandSlope <- recode(kaggle_df$LandSlope, Gtl=1, Mod=2, Sev=3)
+kaggle_df$HouseStyle <- recode(kaggle_df$HouseStyle, "1.5Fin"=1, "1.5Unf"=2, "1Story"=3, "2.5Fin"=4, "2.5Unf"=5, "2Story"=6, "SFoyer"=7, "SLvl"=8)
+kaggle_df$CentralAir <- recode(kaggle_df$CentralAir, N=1, Y=2)
+kaggle_df$SaleType <- recode(kaggle_df$SaleType, "COD"=1, "Con"=2, "ConLD"=3, "ConLI"=4, "ConLw"=5, "CWD"=6, "New"=7, "Oth"=8, "WD"=9)
+kaggle_df$SaleCondition <- recode(kaggle_df$SaleCondition, Abnorml=1, AdjLand=2, Alloca=3, Family=4, Normal=5, Partial=6)
+kaggle_df$Foundation <- recode(kaggle_df$Foundation, BrkTil=1, CBlock=2, PConc=3, Slab=4, Stone=5, Wood=6)
+```
+
+Now, with the categorical values recoded to numeric values, I decided to take the training dataset and only select the columns needed for the analysis:  
+
+```{r}
+train_df <- kaggle_df %>% 
+  dplyr::select(`1stFlrSF`, GrLivArea, GarageArea, TotalBsmtSF, YearBuilt, TotRmsAbvGrd, BedroomAbvGr, BsmtUnfSF, YrSold, LandSlope, HouseStyle, CentralAir, SaleType, SaleCondition, Foundation, SalePrice)
+
+train_df %>% 
+  kable() %>% 
+  kable_styling(bootstrap_options = 'striped')
+
+```
+
+Finally, we can check for any null values. If there are null values, we'll have to impute them:  
+
+```{r}
+anyNA(train_df)
+```
+
+It looks like there aren't any null values in our training dataset, so we are now ready to start building our multiple regression model.
+
+***
+
+##### Building the multiple regression model
+
+For a first step, I'll add in all of the variables that we have in our subsetted dataframe. I'll use backward elimination to remove out any variables with high p-values:  
+
+```{r}
+train_lm <- lm(data = train_df, SalePrice ~ `1stFlrSF` +`GrLivArea` + `GarageArea` + `TotalBsmtSF` + `YearBuilt` + `TotRmsAbvGrd` + `BedroomAbvGr` + `BsmtUnfSF` + `YrSold` + `LandSlope` + `HouseStyle` + `CentralAir` + `SaleType` + `SaleCondition` + `Foundation`)
+
+summary(train_lm)
+```
+Then, using backward elimination, I decided to remove out variables with high p-values:  
+
+```{r}
+train_lm_2 <- step(train_lm, direction = 'backward', trace = FALSE)
+summary(train_lm_2)
+```
+
+This process didn't seem to affect the R-squared value much. Therefore, to try and boost the R-squared value a bit, I'll look back and see if I can add a few more variables and do more testing: 
+
+For this run, I decided to add in `Neighborhood`, `OpenPorchSF`, `KitchenAvbGr`, `ExterQual`, `RoofMatl`, `YearRemodAdd`, and `OverallQual`, while removing a few variables that seem to be showing colinearity -- `CentralAir`, `LandSlope`, `YearBuilt`, `GarageArea`, and `TotRmsAbvGr`.
+
+```{r}
+train_df <- kaggle_df %>% 
+  dplyr::select(`1stFlrSF`, GrLivArea, GarageArea, TotalBsmtSF, YearBuilt, TotRmsAbvGrd, BedroomAbvGr, BsmtUnfSF, YrSold, LandSlope, HouseStyle, CentralAir, SaleType, SaleCondition, Foundation, SalePrice, OverallQual, Fireplaces, YearRemodAdd, LotArea, RoofMatl, ExterQual, Utilities, KitchenAbvGr, Neighborhood, OpenPorchSF)
+
+
+train_lm <- lm(data = train_df, SalePrice ~ `GrLivArea` + `TotalBsmtSF` + `BsmtUnfSF` + `SaleCondition` + OverallQual +  YearRemodAdd + LotArea + RoofMatl + ExterQual + KitchenAbvGr + Neighborhood + OpenPorchSF)
+
+summary(train_lm)
+```
+
+This seemed to boost the R-squared value quite a lot. However, now there are a lot of variables in the output, and I'm worried that it may eventually overfit the data. To help cut down on this, I noticed that a few neighborhoods yielded very low p-values, and others not so much. Therefore, I recoded the Neighborhood variable accordingly:  
+
+```{r}
+
+kaggle_df$Neighborhood <- recode(kaggle_df$Neighborhood,
+                                 Blmngtn = 1,
+                                 Blueste = 1,
+                                 BrDale = 1,
+                                 BrkSide = 1,
+                                 ClearCr = 1,
+                                 CollgCr = 1,
+                                 Crawfor = 1,
+                                 Edwards = 1,
+                                 Gilbert = 1,
+                                 IDOTRR = 1,
+                                 MeadowV = 1,
+                                 Mitchel = 1,
+                                 NAmes = 1,
+                                 NoRidge = 2,
+                                 NPkVill = 1,
+                                 NridgHt = 3,
+                                 NWAmes = 1,
+                                 OldTown = 1,
+                                 Sawyer = 1,
+                                 SawyerW = 1,
+                                 Somerst = 1,
+                                 StoneBr = 4,
+                                 SWISU = 1,
+                                 Timber = 1,
+                                 Veenker = 1)
+
+table(kaggle_df$Neighborhood)
+```
+```{r}
+train_df <- kaggle_df %>% 
+  dplyr::select(`1stFlrSF`, GrLivArea, GarageArea, TotalBsmtSF, YearBuilt, TotRmsAbvGrd, BedroomAbvGr, BsmtUnfSF, YrSold, LandSlope, HouseStyle, CentralAir, SaleType, SaleCondition, Foundation, SalePrice, OverallQual, Fireplaces, YearRemodAdd, LotArea, RoofMatl, ExterQual, Utilities, KitchenAbvGr, Neighborhood, OpenPorchSF)
+
+train_lm <- lm(data = train_df, SalePrice ~ `GrLivArea` + `TotalBsmtSF` + `BsmtUnfSF` + `SaleCondition` + OverallQual +  YearRemodAdd + LotArea + RoofMatl + ExterQual + KitchenAbvGr + Neighborhood)
+
+summary(train_lm)
+```
+
+With this model above, we are able to capture about 85% of the variability in `SalePrice` from these attributes that make up the multiple regression. To be safe, we'll do a bit of testing on the residuals to ensure that this is a valid regression model:  
+
+
+***
+
+##### Evaluating the Model and Residual Analysis
+
+
+After running the summary above, we can see a few things:
+
++ The median residual value is -554, which given the spread of the dataset, it is roughly around zero, which is a good sign.  
+
++ Additionally, the minimum and maximum values of the residuals are roughly around the same, albeit leaning a bit more on the minimum side at -398985 and 259408 respectively.  
+
++ Our Multiple R-squared value is 0.8493, which indicates that these terms account for about 85% of the variability in the Sale Price of the homes in this dataset. This seems to be a pretty good result for our regression model.  
+
+
+Although this seems to be a good sign, we need to check our residuals to see if this qualifies as a suitable regression model.
+
+When plotting residuals (below), we can see that the residuals are pretty uniformly scattered around zero:  
+```{r}
+plot(fitted(train_lm),resid(train_lm))
+```
+
+And finally, the residuals when plotted on a q-q plot appear to be pretty normally distributed, although a bit skewed towards the maximum and minimum. We can see from the histogram that the distribution is unimodal and is slightly left skewed, however, it is approaching normal so I feel that this qualifies as a valid multiple regression model.  
+
+```{r}
+qqnorm(resid(train_lm))
+qqline(resid(train_lm))
+
+hist(resid(train_lm))
+```
 
