@@ -3,8 +3,8 @@ title: "DATA 605 - Final Project"
 author: "Zach Alexander"
 date: "5/17/2020"
 output:
-  html_document: default
-  pdf_document: default
+  html_document:
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -50,7 +50,7 @@ From the above syntax, you can see that I've created a variable $X$ with 10,000 
 
 ***
 
-To work through this, I'll first have to calculate $x$ (the median) and $y$ (the first quartile). Additionally, I've saved $X$ and $Y$ in a dataframe can stored the total number of rows (10,000) in a variable:  
+To work through this, I'll first have to calculate $x$ (the median) and $y$ (the first quartile). Additionally, I've saved $X$ and $Y$ in a dataframe and stored the total number of rows (10,000) in a variable:  
 ```{r}
 x <- quantile(X, 0.50)
 y <- quantile(Y, 0.25)
@@ -98,7 +98,7 @@ P_AandB_2
 **Solution: The probability $P(X>x, \ Y>y) = 0.3756$, which means that the probability that a uniform number from 1 to 10 is greater than the median of 5.45 *and* this number is greater than 1.84 is 0.3756.**  
 
 ***
-> *c)* $P(X<x, \ X>y)$  
+> *c)* $P(X<x \ | \ X>y)$  
 
 ***
 
@@ -353,13 +353,9 @@ Now, let's explore the categorical variables a bit.
 
 ```{r}
 table(kaggle_categorical$LandSlope)
-# table(kaggle_categorical$BldgType)
 table(kaggle_categorical$HouseStyle)
-# table(kaggle_categorical$RoofStyle)
 table(kaggle_categorical$RoofMatl)
-# table(kaggle_categorical$ExterCond)
 table(kaggle_categorical$CentralAir)
-# table(kaggle_categorical$Utilities)
 table(kaggle_categorical$HeatingQC)
 table(kaggle_categorical$SaleType)
 table(kaggle_categorical$SaleCondition)
@@ -481,7 +477,7 @@ round(L, 2)
 round(U, 2)
 ```
 
-And when we multiply these together, we can obtain our original precision matrix ($A$):  
+And when we multiply these together, we can obtain our original matrix ($A$):  
 
 ```{r}
 round(A, 2)
@@ -594,7 +590,7 @@ A few takeaways when comparing the distributions:
 
 ##### Find the 5th and 95th percentiles using CDF
 
-Next, I'll find the 5th and 95th percentiles using the cumulative distribution function (CDF). Thinking back to the formula from our reading, this function is:  
+Next, I'll find the 5th and 95th percentiles using the exponential cumulative distribution function (CDF). Thinking back to the formula from our reading, this function is:  
 
 $$F(x) = 1 - e^{-\lambda x}$$
 Since we already have found $\lambda = 0.000659864$, we can solve the equation accordingly for the 5th percentile:
@@ -665,12 +661,15 @@ emp_95 <- quantile(kaggle_df$GrLivArea, c(0.05, 0.95))[2]
 
 ```{r}
 calc_df <- data.frame(method= c('Exponential pdf percentiles', 'Empirical percentiles'), "percentile_5th" = c(edf_5, emp_5), "percentile_95th" = c(edf_95, emp_95))
-calc_df
+
+calc_df %>% 
+  kable() %>% 
+  kable_styling(bootstrap_options = 'striped')
 ```
 
 **Solution:  My calculations for my exponential CDF percentiles and empirical percentiles can be summarized in the table above. Additionally, I found that when calculating a 95% confidence interval from my empirical data, I found this interval to be $[1488.51, 1542.42]$. I also calculated the mean and median from my empirical data, which equals $1515.46$ and $1464$ respectively. Given that our `GrLivArea` variable is right skewed, the 95% confidence interval that we produced is not very effective and doesn't map to the data very well. Our confidence interval should indicate that if we were to continuously sample houses from this area, with the same sample size of 1460, then we should expect the mean `GrLivArea` value to fall within our bounds of $[1488.51, 1542.42]$ about 95% of the time -- which isn't reflected well in the sense that the empirical median does not fall within this range, characteristic of a right skewed distribution. **  
 
-**Additionally, we found that when using the exponential pdf in an attempt to fit our empirical distribution, we see a large disparity between the 5th percentile of our exponential function (77.73) and our empirical data (848.00). This is also true when looking at the 95th percentiles that were calculated, the exponential pdf yielding 4539 square feet, and the empirical data yielding 2466.1 square feet. These percentiles mean that 95% of the houses in our training dataset have above ground living areas that fall below these markers. Therefore, the exponential percentile suggests that 95% of the houses have above ground living areas that are less than or equal to 4539 square feet, while the empirical data tells us that 95% of the hosues have above ground living areas of up to 2466.1 square feet. This is a large difference between the two, and shows that the empirical distribution we fit would not be a good estimator of our empirical data.**  
+**Additionally, we found that when using the exponential pdf in an attempt to fit our empirical distribution, we see a large disparity between the 5th percentile of our exponential function (77.73) and our empirical data (848.00). This is also true when looking at the 95th percentiles that were calculated, the exponential pdf yielding 4539 square feet, and the empirical data yielding 2466.1 square feet. These percentiles mean that 95% of the houses in our training dataset have above ground living areas that fall below these markers. Therefore, the exponential percentile suggests that 95% of the houses have above ground living areas that are less than or equal to 4539 square feet, while the empirical data tells us that 95% of the houses have above ground living areas of up to 2466.1 square feet. This is a large difference between the two, and shows that the exponential distribution we fit would not be a good estimator of our empirical data.**  
 
 ***
 
@@ -683,6 +682,7 @@ calc_df
 Before we get started on building our multiple regression model, I thought it would be helpful to take a closer look at the training dataset, and to hone in on a few variables that seem like good attributes to include in our analysis.  
 
 Earlier, I developed a large number of correlation matrices and scatter plots to visualize interactions between some of the quantitative variables in the dataset. When looking back at some of this data, I thought the following attributes stood out as possible additions to our regression model:  
+
 + `1stFlrSF` (first floor square feet)  
 + `GrLivArea` (above ground living area square feet)  
 + `GarageArea` (size of garage in square feet)  
@@ -718,11 +718,6 @@ Now, with the categorical values recoded to numeric values, I decided to take th
 ```{r}
 train_df <- kaggle_df %>% 
   dplyr::select(`1stFlrSF`, GrLivArea, GarageArea, TotalBsmtSF, YearBuilt, TotRmsAbvGrd, BedroomAbvGr, BsmtUnfSF, YrSold, LandSlope, HouseStyle, CentralAir, SaleType, SaleCondition, Foundation, SalePrice)
-
-train_df %>% 
-  kable() %>% 
-  kable_styling(bootstrap_options = 'striped')
-
 ```
 
 Finally, we can check for any null values. If there are null values, we'll have to impute them:  
@@ -765,7 +760,7 @@ train_lm <- lm(data = train_df, SalePrice ~ `GrLivArea` + `TotalBsmtSF` + `BsmtU
 summary(train_lm)
 ```
 
-This seemed to boost the R-squared value quite a lot. However, now there are a lot of variables in the output, and I'm worried that it may eventually overfit the data. To help cut down on this, I noticed that a few neighborhoods yielded very low p-values, and others not so much. Therefore, I recoded the Neighborhood variable accordingly:  
+This seemed to boost the R-squared value quite a lot. However, now there are a lot of variables in the output, and I'm worried that it may eventually overfit the testing data. To help cut down on this, I noticed that a few neighborhoods yielded very low p-values, and others not so much. Therefore, I recoded the Neighborhood variable accordingly:  
 
 ```{r}
 
@@ -831,7 +826,7 @@ When plotting residuals (below), we can see that the residuals are pretty unifor
 plot(fitted(train_lm),resid(train_lm))
 ```
 
-And finally, the residuals when plotted on a q-q plot appear to be pretty normally distributed, although a bit skewed towards the maximum and minimum. We can see from the histogram that the distribution is unimodal and is slightly left skewed, however, it is approaching normal so I feel that this qualifies as a valid multiple regression model.  
+And finally, the residuals when plotted on a q-q plot appear to be pretty normally distributed, although a bit skewed at the poles. We can see from the histogram that the distribution is unimodal and is slightly left skewed, however, it is approaching normal so I feel that this qualifies as a valid multiple regression model.  
 
 ```{r}
 qqnorm(resid(train_lm))
@@ -840,3 +835,87 @@ qqline(resid(train_lm))
 hist(resid(train_lm))
 ```
 
+***
+
+##### Importing the test data and making predictions with multiple regression model
+
+```{r, warning=FALSE, message=FALSE}
+test_df <- read_csv('https://raw.githubusercontent.com/zachalexander/data605_cuny/master/Final%20Exam/test.csv')
+```
+
+
+```{r, echo=FALSE, include=FALSE}
+test_df$Neighborhood <- recode(test_df$Neighborhood,
+                                 Blmngtn = 1,
+                                 Blueste = 1,
+                                 BrDale = 1,
+                                 BrkSide = 1,
+                                 ClearCr = 1,
+                                 CollgCr = 1,
+                                 Crawfor = 1,
+                                 Edwards = 1,
+                                 Gilbert = 1,
+                                 IDOTRR = 1,
+                                 MeadowV = 1,
+                                 Mitchel = 1,
+                                 NAmes = 1,
+                                 NoRidge = 2,
+                                 NPkVill = 1,
+                                 NridgHt = 3,
+                                 NWAmes = 1,
+                                 OldTown = 1,
+                                 Sawyer = 1,
+                                 SawyerW = 1,
+                                 Somerst = 1,
+                                 StoneBr = 4,
+                                 SWISU = 1,
+                                 Timber = 1,
+                                 Veenker = 1)
+
+table(test_df$Neighborhood)
+
+test_df$SaleCondition <- recode(test_df$SaleCondition, Abnorml=1, AdjLand=2, Alloca=3, Family=4, Normal=5, Partial=6)
+
+table(test_df$SaleCondition)
+
+```
+
+
+```{r, fig.width=12, fig.height=4}
+sale_predictions <- predict(train_lm, test_df) 
+par(mfrow=c(1,2))
+hist(sale_predictions, breaks=40, xlim=c(0, 600000), main = 'predicted sale price - test data')
+hist(train_df$SalePrice, breaks=50, xlim=c(0, 600000), main = 'sales price - training data')
+```
+
+As we can see when comparing the two distributions, they both seem to be roughly the same shape -- which is a good indication that our predicted values are similar to our training values. Now, we can get this model ready to submit to Kaggle.
+
+##### Report your Kaggle.com user name and score
+
+```{r}
+kaggle_data <- data.frame(id = test_df[,"Id"],  SalePrice = sale_predictions)
+kaggle_data[kaggle_data < 0] <- 0
+kaggle_data <- replace(kaggle_data, is.na(kaggle_data), 0)
+write.csv(kaggle_data, file="kaggle.csv", row.names = FALSE)
+```
+
+Overall, I fell towards the middle of the pack on the leaderboard, but hope to work on this more in the future. It would be great to set this up to run SVM and/or Random Forest to see if I can improve my score.
+
+***
+
+##### My Kaggle Score:  
+
+```{r}
+kaggle_info <- c("zdalexander", 0.42696)
+names(kaggle_info) <- c("Username", "My Score")
+kable(kaggle_info, col.names = "Kaggle") %>% 
+  kable_styling(full_width = F)
+```
+
+
+
+##### My YouTube Link Explaining My Final:  
+
+You can find my YouTube video here: [https://www.youtube.com/watch?v=pvlqQwg9cag](https://www.youtube.com/watch?v=pvlqQwg9cag)
+
+Thanks!
